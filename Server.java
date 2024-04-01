@@ -1,6 +1,7 @@
 package Project2;
 
 import java.net.ServerSocket;
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,6 +28,14 @@ import java.util.concurrent.TimeUnit;
 import javax.xml.crypto.Data;
 
 import java.net.InetSocketAddress;
+
+/*
+ * Sources used:
+ * https://stackoverflow.com/questions/69948921/run-running-tcp-and-udp-server-at-the-same-time
+ * 
+ */
+
+
 public class Server {
 
 
@@ -41,6 +50,45 @@ public class Server {
         System.out.println("Current IP is " + ip);
     }
 
+//Test addition
+    public static void runTCPServer(){
+        List<ClientHandler> clientHandlers = Collections.synchronizedList(new ArrayList<>());
+        try {
+            ServerSocket serverSocket = new ServerSocket(1234);
+            DatagramSocket datagramSocket = new DatagramSocket(1235);
+            System.out.println("Server started");
+            printIP();
+            while (true) {
+                Socket socket = serverSocket.accept();
+                System.out.println("Client connected");
+
+                ClientHandler clientHandler = new ClientHandler(socket);
+                clientHandlers.add(clientHandler);
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+
+    }
+
+
+
+    public static void executeUdpServer() {
+    try (DatagramSocket socket = new DatagramSocket(1235)) {
+      while (true) {
+        byte[] packetBuffer = new byte[2024];
+        final DatagramPacket packet = new DatagramPacket(packetBuffer, packetBuffer.length);
+        System.out.println("waiting for UDP packet...");
+        // Blocks until a packet is received
+        socket.receive(packet);
+        final String receivedPacket = new String(packet.getData()).trim();
+        System.out.println(receivedPacket);
+      }
+    } catch (Exception exception) {
+      exception.printStackTrace();
+    }
+  }
+
 
     public static void main(String[] args) {
         //ServerWindow window = new ServerWindow();
@@ -49,9 +97,9 @@ public class Server {
 
         try {
             ServerSocket serverSocket = new ServerSocket(1234);
-            DatagramSocket datagramSocket = new DatagramSocket(1234);
+            DatagramSocket datagramSocket = new DatagramSocket(1235);
             System.out.println("Server started");
-
+            printIP();
             while (true) {
                 Socket socket = serverSocket.accept();
                 System.out.println("Client connected");
