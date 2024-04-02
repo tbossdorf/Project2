@@ -9,6 +9,7 @@ import java.util.Scanner;
 public class Client {
 
 
+    public static int clientId;
     public static void main(String[] args)
     {
         //Now, we can pass it our IP from the command line. The IP will be printed on the servers console, which we can copy
@@ -54,5 +55,8 @@ public class Client {
         }
 
     }
+
+
+    public int getId(){return clientId;}
     
 }

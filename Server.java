@@ -76,12 +76,17 @@ public class Server {
                 // udpSocket.receive(packet);
                 // final String receivedPacket = new String(packet.getData()).trim();
                 // System.out.println(receivedPacket);
+                
                 if(clientHandlers.size() >= 1){
-                    for(ClientHandler client : clientHandlers)
-                    {
-                        System.out.println(client.readResponse());
+                    ExecutorService executor = Executors.newFixedThreadPool(clientHandlers.size());
+                    while(true){
+                        for(ClientHandler client : clientHandlers){
+                            executor.execute(client);
+                        }
                     }
+                    
                 }
+                
             }
         } catch (Exception e) {
             e.printStackTrace();
