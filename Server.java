@@ -38,7 +38,7 @@ import java.net.InetSocketAddress;
 
 public class Server {
 
-    <ClientHandler> clientHandlers = Collections.synchronizedList(new ArrayList<>());
+    
 
 
     public static void printIP() throws IOException
@@ -51,63 +51,40 @@ public class Server {
     }
 
 
-    public static void executeServers(){
-        try {
-            ServerSocket serverSocket = new ServerSocket(1234);
-            System.out.println("Server started");
-            printIP();
-            while (true) {
-                Socket socket = serverSocket.accept();
-                System.out.println("Client connected");
-
-                ClientHandler clientHandler = new ClientHandler(socket);
-                clientHandlers.add(clientHandler);
-            }
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
-        try (DatagramSocket socket = new DatagramSocket(1235)) {
-            while (true) {
-              byte[] packetBuffer = new byte[2024];
-              final DatagramPacket packet = new DatagramPacket(packetBuffer, packetBuffer.length);
-              System.out.println("waiting for UDP packet...");
-              // Blocks until a packet is received
-              socket.receive(packet);
-              final String receivedPacket = new String(packet.getData()).trim();
-              System.out.println(receivedPacket);
-            }
-          } catch (Exception exception) {
-            exception.printStackTrace();
-          }
-
-    }
 
 
-
-    public static void executeUdpServer() {
-    
-  }
 
 
     public static void main(String[] args) {
         //ServerWindow window = new ServerWindow();
-
         List<ClientHandler> clientHandlers = Collections.synchronizedList(new ArrayList<>());
 
         try {
             ServerSocket serverSocket = new ServerSocket(1234);
-            DatagramSocket datagramSocket = new DatagramSocket(1235);
+            DatagramSocket udpSocket = new DatagramSocket(1235);
             System.out.println("Server started");
             printIP();
             while (true) {
                 Socket socket = serverSocket.accept();
                 System.out.println("Client connected");
-
                 ClientHandler clientHandler = new ClientHandler(socket);
                 clientHandlers.add(clientHandler);
+                // byte[] packetBuffer = new byte[2024];
+                // final DatagramPacket packet = new DatagramPacket(packetBuffer, packetBuffer.length);
+                // System.out.println("waiting for UDP packet...");
+                // // Blocks until a packet is received
+                // udpSocket.receive(packet);
+                // final String receivedPacket = new String(packet.getData()).trim();
+                // System.out.println(receivedPacket);
+                if(clientHandlers.size() >= 1){
+                    for(ClientHandler client : clientHandlers)
+                    {
+                        System.out.println(client.readResponse());
+                    }
+                }
             }
         } catch (Exception e) {
-            // TODO: handle exception
+            e.printStackTrace();
         }
         
     }

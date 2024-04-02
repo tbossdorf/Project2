@@ -1,7 +1,10 @@
 package Project2;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.DatagramSocket;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class Client {
 
@@ -16,7 +19,31 @@ public class Client {
             try
             {
                 Socket socket = new Socket(currentIP, 1234);
+                DatagramSocket udpSocket = new DatagramSocket(1235);
                 System.out.println("Connected to server");
+                PrintWriter out = new PrintWriter(socket.getOutputStream(), true); // Create a PrintWriter
+                Scanner scanner = new Scanner(System.in);
+                while(true)
+                {
+                    System.out.println("Enter a message to send to the server:");
+                    System.out.println("Enter 'exit' to close the connection");
+                    String message = scanner.nextLine();
+                    if(message.equals("exit"))
+                    {
+                        socket.close();
+                        break;
+                    }
+                    else if(message.equals(null))
+                    {
+                        
+                        System.out.println("Invalid input, please try again.");
+                    }
+                    else
+                    {
+                        out.println(message);
+                    }
+                }
+                scanner.close();
             }catch(IOException e)
             {
                 System.out.println("Issue with connecting to server: " + e.getMessage());

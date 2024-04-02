@@ -26,4 +26,23 @@ public class ClientHandler implements Runnable{
     {
 
     }
+
+    public String readResponse() throws IOException
+    {
+        String response = "empty";
+        BufferedReader input = new BufferedReader(new java.io.InputStreamReader(socket.getInputStream())); 
+        //listens for a response for client
+
+        //we know a response will be coming, so this works here
+        while((response = input.readLine()) != null)
+        {
+            if(!response.equals("empty"))
+            {
+                return response;
+                //when we notice a response, we return it
+            }
+        }
+
+        return response;
+    }
 }
