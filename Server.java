@@ -38,7 +38,7 @@ import java.net.InetSocketAddress;
 
 public class Server {
 
-
+    <ClientHandler> clientHandlers = Collections.synchronizedList(new ArrayList<>());
 
 
     public static void printIP() throws IOException
@@ -50,12 +50,10 @@ public class Server {
         System.out.println("Current IP is " + ip);
     }
 
-//Test addition
-    public static void runTCPServer(){
-        List<ClientHandler> clientHandlers = Collections.synchronizedList(new ArrayList<>());
+
+    public static void executeServers(){
         try {
             ServerSocket serverSocket = new ServerSocket(1234);
-            DatagramSocket datagramSocket = new DatagramSocket(1235);
             System.out.println("Server started");
             printIP();
             while (true) {
@@ -68,25 +66,26 @@ public class Server {
         } catch (Exception e) {
             // TODO: handle exception
         }
+        try (DatagramSocket socket = new DatagramSocket(1235)) {
+            while (true) {
+              byte[] packetBuffer = new byte[2024];
+              final DatagramPacket packet = new DatagramPacket(packetBuffer, packetBuffer.length);
+              System.out.println("waiting for UDP packet...");
+              // Blocks until a packet is received
+              socket.receive(packet);
+              final String receivedPacket = new String(packet.getData()).trim();
+              System.out.println(receivedPacket);
+            }
+          } catch (Exception exception) {
+            exception.printStackTrace();
+          }
 
     }
 
 
 
     public static void executeUdpServer() {
-    try (DatagramSocket socket = new DatagramSocket(1235)) {
-      while (true) {
-        byte[] packetBuffer = new byte[2024];
-        final DatagramPacket packet = new DatagramPacket(packetBuffer, packetBuffer.length);
-        System.out.println("waiting for UDP packet...");
-        // Blocks until a packet is received
-        socket.receive(packet);
-        final String receivedPacket = new String(packet.getData()).trim();
-        System.out.println(receivedPacket);
-      }
-    } catch (Exception exception) {
-      exception.printStackTrace();
-    }
+    
   }
 
 
