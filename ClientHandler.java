@@ -1,34 +1,103 @@
 package Project2;
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Socket;
-
-import javax.xml.crypto.Data;
+import java.util.Scanner;
+import java.util.concurrent.BlockingQueue;
 
 public class ClientHandler implements Runnable{
     
-    private Socket tcpSocket;
-    private DatagramSocket udpSocket;
-    private int clientID;
-    
+    private Socket socket;
+    private ObjectOutputStream outStream;
+    private DataInputStream inStream;
+    private int correct = -1;
+    private final int clientID;
+    private final BlockingQueue<Poll> queue;
+    private boolean pollPressed = true;
 
-    public ClientHandler(Socket tcpSocket, DatagramSocket udpSocket, int clientID) throws IOException
+
+    public ClientHandler(Socket socket, int clientID, BlockingQueue<Poll> queue) throws IOException
     {
-        this.tcpSocket = tcpSocket;
+        this.socket = socket;
         this.clientID = clientID;
-        this.udpSocket = udpSocket;
-        OutputStream output = tcpSocket.getOutputStream();
-
+        this.queue = queue;
     }
 
-    public Socket getTCPSocket()
-    {
-        return tcpSocket;
+    private void sendAck(String ack) throws IOException{
+        outStream.writeObject(ack);
+        outStream.flush();
+        System.out.println("Sent acknowledgment to client " + this.clientID + ":" + ack);
+    }
+
+    private void sendID() throws IOException{
+        outStream.writeInt(this.clientID);
+        outStream.flush();
+    }
+
+    private void initialize() throws IOException {
+        outStream = new ObjectOutputStream(socket.getOutStream());
+        inStream = new DataInputStream(socket.getInStream());
+    }
+    
+    void sendQuestions (int questionNum) throws IOException{
+        String filePath = "src/Questions/question" + questionNum + ".txt";
+        File file = new File(filePath);
+        try(Scanner scanner = new Scanner(file)){
+            String type = "File";
+            outStream.writeObject(type);
+            outStream.writeInt(questionNum);
+            int counter = 0;
+            while (counter < 5 && scanner.hasNextLine()){
+                String line = scanner.nextLine();
+                outStream.writeObject(line);
+                counter++;
+            }
+            if (scanner.hasNextInt()){
+                correct = scanner.nextInt();
+            }
+            outStream.flush();
+        }
+    }
+
+    private void clientResponse() throws IOException {
+        while (true){
+            int questionNum = 1;
+
+            pollPressed = inStream.readBoolean();
+
+            System.out.println("Client " + clientID + " pressed Poll button:" + pollPressed);
+
+            if (pollPressed){
+
+                queue.add(new Poll(this.clientID, questionNum));
+                
+                if (!queue.isEmpty() && queue.peek().getClientID() == this.clientID) {
+                    sendAck("ack");
+                    System.out.println("Ack to client " + this.clientID);
+                } else {
+                    sendAck("negative-ack");
+                    System.out.println("Negatuve-ack to client " + this.clientID);
+                }
+            }
+    
+            if (!queue.isEmpty() && queue.peek().getClientID() == this.clientID) {
+                int answer = inStream.readInt(); //read answer
+                System.out.println("Answer chosen by client " + this.clientID + ": " + answer + ". Correct Answer: " + correct);
+                int score = (answer == correct) ? 10 : -20;
+                // outStream.writeObject("Score");
+                // outStream.writeInt(score);
+                outStream.flush();
+            }
+            questionNum++;
+            outStream.flush();
+        }
     }
 
     public DatagramSocket getUDPSocket()
@@ -44,35 +113,35 @@ public class ClientHandler implements Runnable{
     @Override
     public void run()
     {
-
-    }
-
-    public String readResponse() throws IOException
-    {
-        String response = "empty";
-        BufferedReader input = new BufferedReader(new java.io.InputStreamReader(tcpSocket.getInputStream())); 
-        //listens for a response for client
-
-        //we know a response will be coming, so this works here
-        while((response = input.readLine()) != null)
-        {
-            if(!response.equals("empty"))
-            {
-                return response;
-                //when we notice a response, we return it
-            }
+        try{
+            sendQuestions(1);
+        } catch (IOException e){
+            e.printStackTrace();
+        } finally{
+            closeStreams();
         }
-
-        return response;
     }
 
+    private void closeStreams(){
+        try {
+            if (outStream != null) {
+                outStream.close();
+            }
+            if (inStream != null) {
+                inStream.close();
+            }
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-    public String readBuzz() throws IOException
-    {
-        byte[] buffer = new byte[1024];
-        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-        udpSocket.receive(packet);
-        return new String(packet.getData(), 0, packet.getLength());
+    public int getClient(){ //get client id
+        return this.clientID;
+    }
+
+    public void setPressed(boolean pollPressed){
+        this.pollPressed = pollPressed;
     }
 
 }
