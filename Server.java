@@ -97,9 +97,11 @@ public class Server {
         executor.execute(() -> {
             try {
                 ServerSocket serverSocket = new ServerSocket(1234);
+                System.out.println("TCP Server started");
+                printIP();
                 while (true) {
                     Socket socket = serverSocket.accept();
-                    System.out.println("Server started");
+                    System.out.println("Client connected");
                     ClientHandler clientHandler = new ClientHandler(socket, null);
                     clientHandlers.add(clientHandler);
                 }
@@ -112,10 +114,12 @@ public class Server {
         executor.execute(() -> {
             try {
                 DatagramSocket udpSocket = new DatagramSocket(1235);
+                System.out.println("UDP Server started");
                 byte[] packetBuffer = new byte[2024];
                 while (true) {
                     DatagramPacket packet = new DatagramPacket(packetBuffer, packetBuffer.length);
                     udpSocket.receive(packet);
+                    System.out.println("Received UDP packet");
                     ClientHandler clientHandler = new ClientHandler(null, packet);
                     clientHandlers.add(clientHandler);
                 }
