@@ -74,7 +74,7 @@ public class Server {
             executor.execute(this::runTCPServer);
 
             //Start UDP server
-
+            runUDPServer();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -14,12 +14,12 @@ public class Client {
     public static void main(String[] args)
     {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Please enter the IP of the server you would like to connect to: ");
-        String currentIP = scanner.nextLine();
+        
         //Now, we can pass it our IP from the command line. The IP will be printed on the servers console, which we can copy
         //and enter into the client console to actually connect to our server
-        if(currentIP != null)
+        if(args.length == 1)
         {
+            String currentIP = args[0];
             try
             {
                 Socket socket = new Socket(currentIP, 1234);

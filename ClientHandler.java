@@ -62,31 +62,8 @@ public class ClientHandler implements Runnable{
                 //when we notice a response, we return it
             }
         }
+
         return response;
     }
 
-
-    public void sendQuestion(int question) throws IOException
-    {
-        output.
-        
-    }
-
-
-
-    
-
-
-
-
-
-    
-
-
-
-
-
-
-   return response;
-    }
 }
