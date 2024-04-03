@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Scanner;
 
@@ -33,6 +34,7 @@ public class Client {
                     if(message.equals("exit"))
                     {
                         socket.close();
+                        udpSocket.close();
                         break;
                     }
                     else if(message.equals(null))
@@ -42,7 +44,9 @@ public class Client {
                     }
                     else
                     {
-                        DatagramPacket packet = new DatagramPacket(message.getBytes(), message.length(), socket.getInetAddress(), 1235);
+                        byte[] buffer = message.getBytes();
+                        InetAddress serverAddress = InetAddress.getByName(currentIP);
+                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, 1235);
                         udpSocket.send(packet);
                     }
                 }
