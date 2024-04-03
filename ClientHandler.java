@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
+import java.util.concurrent.BlockingQueue;
 
 public class ClientHandler implements Runnable{
     
@@ -16,13 +17,26 @@ public class ClientHandler implements Runnable{
     private DataInputStream inStream;
     private int correct = -1;
     private final int clientID;
+    private final BlockingQueue<Poll> queue;
+    private boolean pollPressed = true;
 
 
-
-    public ClientHandler(Socket socket) throws IOException
+    public ClientHandler(Socket socket, int clientID, BlockingQueue<Poll> queue) throws IOException
     {
         this.socket = socket;
+        this.clientID = clientID;
         this.queue = queue;
+    }
+
+    private void sendAck(String ack) throws IOException{
+        outStream.writeObject(ack);
+        outStream.flush();
+        System.out.println("Sent acknowledgment to client " + this.clientID + ":" + ack);
+    }
+
+    private void sendID() throws IOException{
+        outStream.writeInt(this.clientID);
+        outStream.flush();
     }
 
     private void initialize() throws IOException {
@@ -31,7 +45,7 @@ public class ClientHandler implements Runnable{
     }
     
     void sendQuestions (int questionNum) throws IOException{
-        String filePath = "src/Questions/question" + questionNUm + ".txt";
+        String filePath = "src/Questions/question" + questionNum + ".txt";
         File file = new File(filePath);
         try(Scanner scanner = new Scanner(file)){
             String type = "File";
@@ -52,7 +66,7 @@ public class ClientHandler implements Runnable{
 
     private void clientResponse() throws IOException {
         while (true){
-            int questionNum = x;
+            int questionNum = 1;
 
             pollPressed = inStream.readBoolean();
 

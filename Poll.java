@@ -1,17 +1,21 @@
-public class Poll{
-    private int questionNum;
-    private int client; //is the id of client
+package project2;
 
-    public Poll (int questionNUm, int client){
-        this.questionNum = questionNUm;
-        this.client = client;
+public class Poll{
+    
+    private int questionNum; //number being polled
+    private int clientID; //is the id of client
+
+    public Poll (int questionNum, int clientID){ //initializes a poll object
+        this.questionNum = questionNum;
+        this.clientID = clientID;
     }
 
+    //allows access to questionNum and client outsdie of the poll class
     public int getquestionNum(){
         return this.questionNum;
     }
 
     public int getID(){
-        return this.client;
+        return this.clientID;
     }
 }
