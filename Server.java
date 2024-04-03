@@ -59,38 +59,70 @@ public class Server {
         //ServerWindow window = new ServerWindow();
         List<ClientHandler> clientHandlers = Collections.synchronizedList(new ArrayList<>());
 
-        try {
-            ServerSocket serverSocket = new ServerSocket(1234);
-            DatagramSocket udpSocket = new DatagramSocket(1235);
-            System.out.println("Server started");
-            printIP();
-            while (true) {
-                Socket socket = serverSocket.accept();
-                System.out.println("Client connected");
-                ClientHandler clientHandler = new ClientHandler(socket);
-                clientHandlers.add(clientHandler);
-                // byte[] packetBuffer = new byte[2024];
-                // final DatagramPacket packet = new DatagramPacket(packetBuffer, packetBuffer.length);
-                // System.out.println("waiting for UDP packet...");
-                // // Blocks until a packet is received
-                // udpSocket.receive(packet);
-                // final String receivedPacket = new String(packet.getData()).trim();
-                // System.out.println(receivedPacket);
+        // try {
+        //     ServerSocket serverSocket = new ServerSocket(1234);
+        //     DatagramSocket udpSocket = new DatagramSocket(1235);
+        //     System.out.println("Server started");
+        //     printIP();
+        //     while (true) {
+        //         Socket socket = serverSocket.accept();
+        //         System.out.println("Client connected");
+        //         ClientHandler clientHandler = new ClientHandler(socket);
+        //         clientHandlers.add(clientHandler);
+        //         byte[] packetBuffer = new byte[2024];
                 
-                if(clientHandlers.size() >= 1){
-                    ExecutorService executor = Executors.newFixedThreadPool(clientHandlers.size());
-                    while(true){
-                        for(ClientHandler client : clientHandlers){
-                            executor.execute(client);
-                        }
-                    }
+        //         if(clientHandlers.size() >= 1){
+        //             ExecutorService executor = Executors.newFixedThreadPool(clientHandlers.size());
+        //             while(true){
+        //                 DatagramPacket packet = new DatagramPacket(packetBuffer, packetBuffer.length);
+        //                 System.out.println("waiting for UDP packet...");
+        //                 // Blocks until a packet is received
+        //                 udpSocket.receive(packet);
+        //                 final String receivedPacket = new String(packet.getData()).trim();
+        //                 System.out.println(receivedPacket);
                     
-                }
+        //             }
+                    
+        //         }
                 
+        //     }
+        // } catch (Exception e) {
+        //     e.printStackTrace();
+        // }
+
+
+        ExecutorService executor = Executors.newFixedThreadPool(2); // Create a thread pool
+
+        // TCP Server
+        executor.execute(() -> {
+            try {
+                ServerSocket serverSocket = new ServerSocket(1234);
+                while (true) {
+                    Socket socket = serverSocket.accept();
+                    System.out.println("Server started");
+                    ClientHandler clientHandler = new ClientHandler(socket, null);
+                    clientHandlers.add(clientHandler);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        });
+
+        // UDP Server
+        executor.execute(() -> {
+            try {
+                DatagramSocket udpSocket = new DatagramSocket(1235);
+                byte[] packetBuffer = new byte[2024];
+                while (true) {
+                    DatagramPacket packet = new DatagramPacket(packetBuffer, packetBuffer.length);
+                    udpSocket.receive(packet);
+                    ClientHandler clientHandler = new ClientHandler(null, packet);
+                    clientHandlers.add(clientHandler);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
         
     }
     

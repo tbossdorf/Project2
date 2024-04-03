@@ -2,6 +2,7 @@ package Project2;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Socket;
 import java.util.Scanner;
@@ -41,7 +42,8 @@ public class Client {
                     }
                     else
                     {
-                        out.println(message);
+                        DatagramPacket packet = new DatagramPacket(message.getBytes(), message.length(), socket.getInetAddress(), 1235);
+                        udpSocket.send(packet);
                     }
                 }
                 scanner.close();
