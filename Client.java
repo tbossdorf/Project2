@@ -11,25 +11,24 @@ import java.util.Scanner;
 public class Client {
 
 
-    public static int clientId;
     public static void main(String[] args)
     {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Please enter the IP of the server you would like to connect to: ");
+        String currentIP = scanner.nextLine();
         //Now, we can pass it our IP from the command line. The IP will be printed on the servers console, which we can copy
         //and enter into the client console to actually connect to our server
-        if(args.length == 1)
+        if(currentIP != null)
         {
-            String currentIP = args[0];
             try
             {
                 Socket socket = new Socket(currentIP, 1234);
-                DatagramSocket udpSocket = new DatagramSocket(1235);
+                DatagramSocket udpSocket = new DatagramSocket(4321);
                 System.out.println("Connected to server");
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true); // Create a PrintWriter
-                Scanner scanner = new Scanner(System.in);
                 while(true)
                 {
-                    System.out.println("Enter a message to send to the server:");
-                    System.out.println("Enter 'exit' to close the connection");
+                    
                     String message = scanner.nextLine();
                     if(message.equals("exit"))
                     {
@@ -44,10 +43,10 @@ public class Client {
                     }
                     else
                     {
-                        byte[] buffer = message.getBytes();
-                        InetAddress serverAddress = InetAddress.getByName(currentIP);
-                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, 1235);
-                        udpSocket.send(packet);
+                        if(message.equals("Buzz"))
+                        {
+                            sendBuzz(udpSocket, currentIP);
+                        }
                     }
                 }
                 scanner.close();
@@ -63,6 +62,15 @@ public class Client {
     }
 
 
-    public int getId(){return clientId;}
+
+
+    public static void sendBuzz(DatagramSocket udpSocket, String currentIP) throws IOException
+    {
+        String response = "Buzz";
+        byte[] buffer = response.getBytes();
+        InetAddress serverAddress = InetAddress.getByName(currentIP);
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, 4321);
+        udpSocket.send(packet);
+    }
     
 }

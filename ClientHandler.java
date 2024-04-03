@@ -2,27 +2,43 @@ package Project2;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Socket;
 
+import javax.xml.crypto.Data;
+
 public class ClientHandler implements Runnable{
     
-    private Socket socket;
-    private DatagramPacket packet;
-    private PrintWriter out;
+    private Socket tcpSocket;
+    private DatagramSocket udpSocket;
+    private int clientID;
+    
 
-    public ClientHandler(Socket socket, DatagramPacket packet) throws IOException
+    public ClientHandler(Socket tcpSocket, DatagramSocket udpSocket, int clientID) throws IOException
     {
-        this.socket = socket;
-        this.packet = packet;
-        this.out = new PrintWriter(socket.getOutputStream(), true);
+        this.tcpSocket = tcpSocket;
+        this.clientID = clientID;
+        this.udpSocket = udpSocket;
+        OutputStream output = tcpSocket.getOutputStream();
+
     }
 
-    public Socket getSocket()
+    public Socket getTCPSocket()
     {
-        return socket;
+        return tcpSocket;
+    }
+
+    public DatagramSocket getUDPSocket()
+    {
+        return udpSocket;
+    }
+
+    public int getClientID()
+    {
+        return clientID;
     }
 
     @Override
@@ -34,7 +50,7 @@ public class ClientHandler implements Runnable{
     public String readResponse() throws IOException
     {
         String response = "empty";
-        BufferedReader input = new BufferedReader(new java.io.InputStreamReader(socket.getInputStream())); 
+        BufferedReader input = new BufferedReader(new java.io.InputStreamReader(tcpSocket.getInputStream())); 
         //listens for a response for client
 
         //we know a response will be coming, so this works here
@@ -46,7 +62,31 @@ public class ClientHandler implements Runnable{
                 //when we notice a response, we return it
             }
         }
-
         return response;
+    }
+
+
+    public void sendQuestion(int question) throws IOException
+    {
+        output.
+        
+    }
+
+
+
+    
+
+
+
+
+
+    
+
+
+
+
+
+
+   return response;
     }
 }
