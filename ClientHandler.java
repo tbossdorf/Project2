@@ -66,4 +66,13 @@ public class ClientHandler implements Runnable{
         return response;
     }
 
+
+    public String readBuzz() throws IOException
+    {
+        byte[] buffer = new byte[1024];
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+        udpSocket.receive(packet);
+        return new String(packet.getData(), 0, packet.getLength());
+    }
+
 }

@@ -136,7 +136,11 @@ public class Server {
                         executor.execute(ch);
                     }
                     while(true){
-                        
+                        for(ClientHandler ch : clientHandlers){
+                            if(ch.readBuzz() == "Buzz"){
+                                System.out.println("Buzz received from " + ch.getClientID());
+                            }
+                        }
                     }
                 
                 }
