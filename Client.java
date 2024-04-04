@@ -58,10 +58,6 @@ public class Client {
                 System.out.println("Connected to server");
                 while(true)
                 {
-                    String ack = reader.readLine();
-                    if(ack == "ack"){
-                        System.out.println("acknowledgment received");
-                    }
 
                 }
             }catch(IOException e)
@@ -110,6 +106,11 @@ public class Client {
     public BufferedReader getReader()
     {
         return reader;
+    }
+
+    public String getServerResponse() throws IOException
+    {
+        return reader.readLine();
     }
 
 

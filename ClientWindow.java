@@ -125,7 +125,6 @@ public class ClientWindow implements ActionListener
 	public void actionPerformed(ActionEvent e)
 	{
 		System.out.println("You clicked " + e.getActionCommand());
-		
 		// input refers to the radio button you selected or button you clicked
 		String input = e.getActionCommand();  
 		switch(input)
@@ -133,6 +132,8 @@ public class ClientWindow implements ActionListener
 			case "Poll":		// Your code here
 				try {
 					client.sendBuzz(client.getUdpSocket(), client.getCurrentIP());
+					handleAcknowledgment(client.getServerResponse());
+					System.out.println(client.getServerResponse());
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -148,6 +149,18 @@ public class ClientWindow implements ActionListener
 						e1.printStackTrace();
 					}
 				}
+								break;
+			case "Option 1":		// Your code here
+				chosen = 1;
+								break;
+			case "Option 2":		// Your code here
+				chosen = 2;
+								break;
+			case "Option 3":		// Your code here
+				chosen = 3;
+								break;
+			case "Option 4":		// Your code here
+				chosen = 4;
 								break;
 			default:
 								System.out.println("Incorrect Option");
