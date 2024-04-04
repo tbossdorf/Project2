@@ -3,6 +3,7 @@ package Project2;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.TimerTask;
 import java.util.Timer;
@@ -20,7 +21,7 @@ public class ClientWindow implements ActionListener
 	private TimerTask clock;
 	private String	ip;
 	private JFrame window;
-	private Client client.
+	private Client client;
 	
 	private static SecureRandom random = new SecureRandom();
 	
@@ -30,8 +31,8 @@ public class ClientWindow implements ActionListener
 	{
 		JOptionPane.showMessageDialog(window, "This is a trivia game");
 		this.ip = ip;
-		client = new Client(ip);
-		client.run();  // create a client object to connect to the server
+		//client = new Client(ip);
+		//client.run();  // create a client object to connect to the server
 		window = new JFrame("Trivia");
 		question = new JLabel("Q1. This is a sample question"); // represents the question
 		window.add(question);
@@ -100,7 +101,12 @@ public class ClientWindow implements ActionListener
 			case "Option 4":	// Your code here
 								break;
 			case "Poll":		// Your code here
-				client.sendBuzz(); // sends a poll to the server
+				// try {
+				// 	client.sendBuzz();
+				// } catch (IOException e1) {
+				// 	// TODO Auto-generated catch block
+				// 	e1.printStackTrace();
+				// } // sends a poll to the server
 								break;
 			case "Submit":		// Your code here
 								break;
