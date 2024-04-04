@@ -42,8 +42,8 @@ public class ClientHandler implements Runnable{
     }
 
     private void initialize() throws IOException {
-        outStream = new ObjectOutputStream(socket.getOutStream());
-        inStream = new DataInputStream(socket.getInStream());
+        outStream = new ObjectOutputStream(socket.getOutputStream());
+        inStream = new DataInputStream(socket.getInputStream());
     }
     
     void sendQuestions (int questionNum) throws IOException{
@@ -78,7 +78,7 @@ public class ClientHandler implements Runnable{
 
                 queue.add(new Poll(this.clientID, questionNum));
                 
-                if (!queue.isEmpty() && queue.peek().getClientID() == this.clientID) {
+                if (!queue.isEmpty() && queue.peek().getID() == this.clientID) {
                     sendAck("ack");
                     System.out.println("Ack to client " + this.clientID);
                 } else {
@@ -87,7 +87,7 @@ public class ClientHandler implements Runnable{
                 }
             }
     
-            if (!queue.isEmpty() && queue.peek().getClientID() == this.clientID) {
+            if (!queue.isEmpty() && queue.peek().getID() == this.clientID) {
                 int answer = inStream.readInt(); //read answer
                 System.out.println("Answer chosen by client " + this.clientID + ": " + answer + ". Correct Answer: " + correct);
                 int score = (answer == correct) ? 10 : -20;
@@ -100,10 +100,6 @@ public class ClientHandler implements Runnable{
         }
     }
 
-    public DatagramSocket getUDPSocket()
-    {
-        return udpSocket;
-    }
 
     public int getClientID()
     {

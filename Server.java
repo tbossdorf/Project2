@@ -46,12 +46,15 @@ public class Server {
     private DatagramSocket datagramSocket;
     private boolean running;
     private ArrayList<Integer> nums;
+    private Queue waitQueue;
 
     public Server(){
         clientHandlers = Collections.synchronizedList(new ArrayList<>());
         executor = Executors.newCachedThreadPool();
         running = false;
         nums = new ArrayList<>();
+        waitQueue = new Queue();
+
     }
 
     public void start() {
@@ -129,18 +132,13 @@ public class Server {
             while (true) {
                 Socket socket = serverSocket.accept();
                 System.out.println("Client connected");
-                ClientHandler clientHandler = new ClientHandler(socket, datagramSocket, nums.remove(0));
+                ClientHandler clientHandler = new ClientHandler(socket, nums.remove(0), waitQueue.getQueue() );
                 clientHandlers.add(clientHandler);
                 if(running){
                     for(ClientHandler ch : clientHandlers){
                         executor.execute(ch);
                     }
                     while(true){
-                        for(ClientHandler ch : clientHandlers){
-                            if(ch.readBuzz() == "Buzz"){
-                                System.out.println("Buzz received from " + ch.getClientID());
-                            }
-                        }
                     }
                 
                 }
