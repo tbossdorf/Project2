@@ -1,5 +1,7 @@
 package Project2;
 
+
+
 public class ClientWindowTest
 {
 	public static void main(String[] args)
@@ -8,7 +10,8 @@ public class ClientWindowTest
 		{
 			System.out.println("Usage: java ClientWindowTest <IP>");
 			System.exit(1);
-		}else{
+		}
+		else{
 			String currentIP = args[0];
 			ClientWindow window = new ClientWindow(currentIP);
 		}
