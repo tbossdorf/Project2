@@ -11,15 +11,25 @@ import java.util.Scanner;
 public class Client {
 
 
-    public static void main(String[] args)
+    private String currentIP;
+    private Socket socket;
+    private DatagramSocket udpSocket;
+
+
+    public Client(String currentIP){
+        this.currentIP = currentIP;
+        
+    }
+
+    public void run()
     {
         Scanner scanner = new Scanner(System.in);
         
         //Now, we can pass it our IP from the command line. The IP will be printed on the servers console, which we can copy
         //and enter into the client console to actually connect to our server
-        if(args.length == 1)
+        if(currentIP != null)
         {
-            String currentIP = args[0];
+            
             try
             {
                 Socket socket = new Socket(currentIP, 1234);
@@ -45,7 +55,7 @@ public class Client {
                     {
                         if(message.equals("Buzz"))
                         {
-                            sendBuzz(udpSocket, currentIP);
+                            sendBuzz();
                         }
                     }
                 }
@@ -64,7 +74,7 @@ public class Client {
 
 
 
-    public static void sendBuzz(DatagramSocket udpSocket, String currentIP) throws IOException
+    public void sendBuzz() throws IOException
     {
         String response = "Buzz";
         byte[] buffer = response.getBytes();

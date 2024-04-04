@@ -18,17 +18,20 @@ public class ClientWindow implements ActionListener
 	private JLabel timer;
 	private JLabel score;
 	private TimerTask clock;
-	
+	private String	ip;
 	private JFrame window;
+	private Client client.
 	
 	private static SecureRandom random = new SecureRandom();
 	
 	// write setters and getters as you need
 	
-	public ClientWindow()
+	public ClientWindow(String ip)
 	{
 		JOptionPane.showMessageDialog(window, "This is a trivia game");
-		
+		this.ip = ip;
+		client = new Client(ip);
+		client.run();  // create a client object to connect to the server
 		window = new JFrame("Trivia");
 		question = new JLabel("Q1. This is a sample question"); // represents the question
 		window.add(question);
@@ -97,7 +100,7 @@ public class ClientWindow implements ActionListener
 			case "Option 4":	// Your code here
 								break;
 			case "Poll":		// Your code here
-				
+				client.sendBuzz(); // sends a poll to the server
 								break;
 			case "Submit":		// Your code here
 								break;

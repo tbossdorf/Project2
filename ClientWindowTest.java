@@ -4,6 +4,7 @@ public class ClientWindowTest
 {
 	public static void main(String[] args)
 	{
-		ClientWindow window = new ClientWindow();
+		String currentIP = args[0];
+		ClientWindow window = new ClientWindow(currentIP);
 	}
 }
