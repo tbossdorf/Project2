@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.Socket;
 import java.util.Scanner;
 import java.util.concurrent.BlockingQueue;
@@ -98,9 +100,14 @@ public class ClientHandler implements Runnable{
         }
     }
 
-    public Socket getSocket()
+    public DatagramSocket getUDPSocket()
     {
-        return socket;
+        return udpSocket;
+    }
+
+    public int getClientID()
+    {
+        return clientID;
     }
 
     @Override
