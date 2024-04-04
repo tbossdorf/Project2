@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.DataInputStream;
+import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.SecureRandom;
@@ -21,6 +22,7 @@ public class ClientWindow implements ActionListener
 	private JLabel score;
 	private TimerTask clock;
 	private int chosen;
+	private int theScore;
 
 	private Socket socket; //represents the socket connection with the client
     private ObjectOutputStream outStream; //sends data to client
@@ -28,6 +30,8 @@ public class ClientWindow implements ActionListener
     private int clientID; //identifies the client
 	private String questionNum; //identifies the question number
 	private boolean canChoose = true; //tracks if client is allowed to choose answer
+	private boolean buzzed = true; //tracks if client has buzzed
+	private int correct = -1; //holds the correct answer to the question
 
 	
 	private JFrame window;
@@ -44,6 +48,11 @@ public class ClientWindow implements ActionListener
 		question = new JLabel("Q1. This is a sample question"); // represents the question
 		window.add(question);
 		question.setBounds(10, 5, 350, 100);;
+		try {
+			correct = inStream.readInt();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 		options = new JRadioButton[4];
 		optionGroup = new ButtonGroup();
@@ -112,6 +121,9 @@ public class ClientWindow implements ActionListener
 		}
 	}
 
+	private void updateScore(){
+		score.setText("Score: " + theScore);
+	}
 	
 
 	// this method is called when you check/uncheck any radio button
@@ -125,10 +137,30 @@ public class ClientWindow implements ActionListener
 		String input = e.getActionCommand();  
 		switch(input)
 		{
-			case "Poll":		// Your code here
+			case "Poll":		
+
+			if(!buzzed){
+
+				buzzed = true;
+				poll.setEnabled(false);
+			}
 				
 								break;
-			case "Submit":		// Your code here
+			case "Submit":	
+			
+			if(canChoose && buzzed){
+			
+				if (chosen == correct){
+					theScore += 10;
+				} else if (chosen != correct){
+					theScore -= 10;
+				} else{
+					theScore -= 20;
+				}
+				updateScore();
+				canChoose = false;
+				submit.setEnabled(false);
+			}
 								break;
 			default:
 								System.out.println("Incorrect Option");

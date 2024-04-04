@@ -70,6 +70,7 @@ public class ClientHandler implements Runnable{
             if (scanner.hasNextInt()){
                 //sets correct answer integer being read to correct variable
                 correct = scanner.nextInt();
+                outStream.writeInt(correct);
             }
             //flushes output stream to ensure all data is sent
             outStream.flush();
@@ -124,7 +125,7 @@ public class ClientHandler implements Runnable{
             System.out.println("Answer chosen by client " + this.clientID + ": " + answer + ". Correct Answer: " + correct);
 
             //calculates clients score
-            int score = (answer == correct) ? 10 : -20;
+            int score = (answer == correct) ? 10 : -10;
             outStream.writeObject("Score");
             outStream.writeInt(score);
 
