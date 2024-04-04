@@ -24,14 +24,6 @@ public class Client {
         
         //Now, we can pass it our IP from the command line. The IP will be printed on the servers console, which we can copy
         //and enter into the client console to actually connect to our server
-        run(currentIP);
-
-    }
-
-
-
-
-    private static void run(String currentIP){
         if(currentIP != null)
         {
             Scanner scanner = new Scanner(System.in);
@@ -60,11 +52,7 @@ public class Client {
                     {
                         if(message.equals("Buzz"))
                         {
-                            String response = "Buzz";
-                            byte[] buffer = response.getBytes();
-                            InetAddress serverAddress = InetAddress.getByName(currentIP);
-                            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, 4321);
-                            udpSocket.send(packet);
+                            sendBuzz(udpSocket, currentIP);
                         }
                     }
                 }
@@ -77,10 +65,18 @@ public class Client {
         {
             System.out.println("Please enter an IP into the command line as an arg to connect to the server.");
         }
+
     }
 
 
-    public static void sendBuzz() throws IOException
+
+
+    private void run(String currentIP){
+        
+    }
+
+
+    public static void sendBuzz(DatagramSocket udpSocket, String currentIP) throws IOException
     {
         String response = "Buzz";
         byte[] buffer = response.getBytes();
