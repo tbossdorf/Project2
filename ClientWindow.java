@@ -40,12 +40,9 @@ public class ClientWindow implements ActionListener
 	
 	// write setters and getters as you need
 	
-	public ClientWindow(String ip)
+	public ClientWindow()
 	{
 		JOptionPane.showMessageDialog(window, "This is a trivia game");
-		this.ip = ip;
-		client = new Client(ip);
-		client.run();  // create a client object to connect to the server
 		window = new JFrame("Trivia");
 		question = new JLabel("Q1. This is a sample question"); // represents the question
 		window.add(question);

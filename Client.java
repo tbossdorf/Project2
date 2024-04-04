@@ -20,6 +20,7 @@ public class Client {
     {
         String currentIP = args[0];
         Scanner scanner = new Scanner(System.in);
+        ClientWindow window = new ClientWindow();
         
         //Now, we can pass it our IP from the command line. The IP will be printed on the servers console, which we can copy
         //and enter into the client console to actually connect to our server
