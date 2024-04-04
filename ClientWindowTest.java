@@ -5,7 +5,7 @@ public class ClientWindowTest
 	{
 		
 		//String currentIP = "10.111.103.120";
-		//ClientWindow window = new ClientWindow(currentIP);
+		ClientWindow window = new ClientWindow();
 		
 		
 	}

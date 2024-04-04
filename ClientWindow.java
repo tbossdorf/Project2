@@ -130,7 +130,8 @@ public class ClientWindow implements ActionListener
 		{
 			case "Poll":		// Your code here
 				try {
-					client.sendBuzz();
+					Client.sendBuzz();
+					
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();

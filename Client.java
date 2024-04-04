@@ -19,14 +19,22 @@ public class Client {
     public static void main(String[] args)
     {
         String currentIP = args[0];
-        Scanner scanner = new Scanner(System.in);
-        ClientWindow window = new ClientWindow();
+        //Scanner scanner = new Scanner(System.in);
+        //ClientWindow window = new ClientWindow();
         
         //Now, we can pass it our IP from the command line. The IP will be printed on the servers console, which we can copy
         //and enter into the client console to actually connect to our server
+        run(currentIP);
+
+    }
+
+
+
+
+    private static void run(String currentIP){
         if(currentIP != null)
         {
-            
+            Scanner scanner = new Scanner(System.in);
             try
             {
                 Socket socket = new Socket(currentIP, 1234);
@@ -69,13 +77,10 @@ public class Client {
         {
             System.out.println("Please enter an IP into the command line as an arg to connect to the server.");
         }
-
     }
 
 
-
-
-    public void sendBuzz() throws IOException
+    public static void sendBuzz() throws IOException
     {
         String response = "Buzz";
         byte[] buffer = response.getBytes();
