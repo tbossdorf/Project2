@@ -51,6 +51,7 @@ public class Client {
                     else
                     {
                         if(message.equals("Buzz"))
+                        System.out.println("Buzzing in...");
                         {
                             sendBuzz(udpSocket, currentIP);
                         }
