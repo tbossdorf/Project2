@@ -51,7 +51,7 @@ public class ClientHandler implements Runnable{
     //sends questions to client over output stream
     void sendQuestions (int questionNum) throws IOException{
         //constructs a file path a scanner
-        String filePath = "src/Questions/question" + questionNum + ".txt";
+        String filePath = "src/Questions/Question" + questionNum + ".txt";
         File file = new File(filePath);
         //reads questions out of a file using
         try(Scanner scanner = new Scanner(file)){

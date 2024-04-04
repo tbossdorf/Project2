@@ -32,6 +32,7 @@ public class ClientWindow implements ActionListener
 	private boolean canChoose = true; //tracks if client is allowed to choose answer
 	private boolean buzzed = true; //tracks if client has buzzed
 	private int correct = -1; //holds the correct answer to the question
+	private int currentQuestion = 1;
 
 	
 	private JFrame window;
@@ -45,14 +46,9 @@ public class ClientWindow implements ActionListener
 		JOptionPane.showMessageDialog(window, "This is a trivia game");
 		
 		window = new JFrame("Trivia");
-		question = new JLabel("Q1. This is a sample question"); // represents the question
+		question = new JLabel("questions"); // represents the question
 		window.add(question);
 		question.setBounds(10, 5, 350, 100);;
-		try {
-			correct = inStream.readInt();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		
 		options = new JRadioButton[4];
 		optionGroup = new ButtonGroup();
@@ -96,6 +92,21 @@ public class ClientWindow implements ActionListener
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(false);
 	}
+	public ClientWindow(Socket socket){
+		try {
+			this.socket = socket;
+			inStream = new DataInputStream(socket.getInputStream());
+			correct = inStream.readInt();
+			//sendQuestions(currentQuestion);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void nextQuestion(){
+		currentQuestion++;
+		//clientHandler(currentQuestion);
+	}
 
 	//handles the submit button using ack and nack
 	private void handleAcknowledgment(String acknowledgmentType) {
@@ -124,7 +135,7 @@ public class ClientWindow implements ActionListener
 	private void updateScore(){
 		score.setText("Score: " + theScore);
 	}
-	
+	              
 
 	// this method is called when you check/uncheck any radio button
 	// this method is called when you press either of the buttons- submit/poll
@@ -198,5 +209,14 @@ public class ClientWindow implements ActionListener
 			window.repaint();
 		}
 	}
+
+	// main method to run the application
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                new ClientWindow();
+            }
+        });
+    }
 	
 }
