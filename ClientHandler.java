@@ -92,6 +92,7 @@ public class ClientHandler implements Runnable{
             //System.out.println("Client " + clientID + " pressed Poll button:" + pollPressed);
             
             //if client has pressed poll button
+            System.out.println("Waiting for Buzz from client " + clientID);
             byte[] buffer = new byte[256];
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
             udpSocket.receive(packet);
@@ -120,8 +121,8 @@ public class ClientHandler implements Runnable{
     //when client presses poll button
     private void handlePoll (int questionNum) throws IOException{
         //creates a new poll object with clientID and questionNum
-        queue.add(new Poll(this.clientID, questionNum)); //adds poll object to queue
-
+        queue.add(new Poll(questionNum, this.clientID)); //adds poll object to queue
+        System.out.println("Head client in queue: " + queue.peek().getID() + " Question number: " + queue.peek().getquestionNum());
         //if queue is empty and client is at front sends an ack
         if (!queue.isEmpty() && queue.peek().getID() == this.clientID) {
             sendAck("ack");
@@ -162,10 +163,12 @@ public class ClientHandler implements Runnable{
     {
         try{
             initialize();
+
+            
             clientResponse();
-            sendQuestions(1);
-            sendID();
-            clientResponse();
+            //sendQuestions(1);
+            //sendID();
+            //clientResponse();
         } catch (IOException e){
             e.printStackTrace();
         } finally{

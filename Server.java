@@ -76,7 +76,7 @@ public class Server {
             executor.execute(this::runTCPServer);
 
             //Start UDP server
-            runUDPServer();
+            //runUDPServer();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -107,24 +107,21 @@ public class Server {
 
 
 
-    private void runUDPServer(){
-        try {
-            System.out.println("UDP Server started");
-            byte[] packetBuffer = new byte[2024];
-            while (clientHandlers.size() >=1){
-                // for(ClientHandler ch : clientHandlers){
-                    
-                // 
-                DatagramPacket packet = new DatagramPacket(packetBuffer, packetBuffer.length);
-                datagramSocket.receive(packet);
-                System.out.println("Received UDP packet");
-                String receivedPacket = new String(packet.getData()).trim();
-                System.out.println(receivedPacket + " from ");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    // private void runUDPServer(){
+    //     try {
+    //         System.out.println("UDP Server started");
+    //         byte[] packetBuffer = new byte[2024];
+    //         while (true){
+    //             // DatagramPacket packet = new DatagramPacket(packetBuffer, packetBuffer.length);
+    //             // datagramSocket.receive(packet);
+    //             // System.out.println("Received UDP packet");
+    //             // String receivedPacket = new String(packet.getData()).trim();
+    //             // System.out.println(receivedPacket + " from ");
+    //         }
+    //     } catch (IOException e) {
+    //         e.printStackTrace();
+    //     }
+    // }
 
 
 
@@ -136,14 +133,12 @@ public class Server {
                 System.out.println("Client connected");
                 ClientHandler clientHandler = new ClientHandler(socket, nums.remove(0), waitQueue.getQueue(), datagramSocket);
                 clientHandlers.add(clientHandler);
-                if(running){
-                    for(ClientHandler ch : clientHandlers){
-                        executor.execute(ch);
-                    }
-                    while(true){
-                    }
                 
+                for(ClientHandler ch : clientHandlers){
+                    executor.execute(ch);
                 }
+                
+                
             }
         } catch (IOException e) {
             e.printStackTrace();

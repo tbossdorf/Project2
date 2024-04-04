@@ -16,9 +16,13 @@ public class Client {
     private DatagramSocket udpSocket;
 
 
-    public static void main(String[] args)
+    public Client(String currentIP)
     {
-        String currentIP = args[0];
+        this.currentIP = currentIP;
+    }
+
+    public void run()
+    {
         //Scanner scanner = new Scanner(System.in);
         //ClientWindow window = new ClientWindow();
         
@@ -71,19 +75,23 @@ public class Client {
 
 
 
-
-    private void run(String currentIP){
-        
-    }
-
-
-    public static void sendBuzz(DatagramSocket udpSocket, String currentIP) throws IOException
+    public void sendBuzz(DatagramSocket udpSocket, String currentIP) throws IOException
     {
         String response = "Buzz";
         byte[] buffer = response.getBytes();
         InetAddress serverAddress = InetAddress.getByName(currentIP);
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, 4321);
         udpSocket.send(packet);
+    }
+
+    public DatagramSocket getUdpSocket()
+    {
+        return udpSocket;
+    }
+
+    public String getCurrentIP()
+    {
+        return currentIP;
     }
     
 }

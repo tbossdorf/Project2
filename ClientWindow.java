@@ -40,8 +40,10 @@ public class ClientWindow implements ActionListener
 	
 	// write setters and getters as you need
 	
-	public ClientWindow()
+	public ClientWindow(Client client)
 	{
+		this.client = client;
+		client.run();
 		JOptionPane.showMessageDialog(window, "This is a trivia game");
 		window = new JFrame("Trivia");
 		question = new JLabel("Q1. This is a sample question"); // represents the question
@@ -130,8 +132,7 @@ public class ClientWindow implements ActionListener
 		{
 			case "Poll":		// Your code here
 				try {
-					Client.sendBuzz();
-					
+					client.sendBuzz(client.getUdpSocket(), client.getCurrentIP());
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
