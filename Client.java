@@ -1,6 +1,10 @@
 package Project2;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -14,6 +18,9 @@ public class Client {
     private String currentIP;
     private Socket socket;
     private DatagramSocket udpSocket;
+    private ObjectOutputStream outStream; //sends data to clientHandler
+    private DataInputStream inStream; //receives data from clientHandler
+
 
 
     public Client(String currentIP)
@@ -35,8 +42,10 @@ public class Client {
             {
                 Socket socket = new Socket(currentIP, 1234);
                 DatagramSocket udpSocket = new DatagramSocket(4321);
+                outStream = new ObjectOutputStream(socket.getOutputStream());
+                inStream = new DataInputStream(socket.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inStream));
                 System.out.println("Connected to server");
-                PrintWriter out = new PrintWriter(socket.getOutputStream(), true); // Create a PrintWriter
                 while(true)
                 {
                     
@@ -59,6 +68,15 @@ public class Client {
                         {
                             sendBuzz(udpSocket, currentIP);
                         }
+
+                        String ack = reader.readLine();
+                        if(ack == "ack"){
+                            System.out.println("You're turn to answer");
+                            System.out.println("Enter an answer:");
+                            String answer = scanner.nextLine();
+                            sendAnswer(Integer.parseInt(answer), outStream);
+                        }
+
                     }
                 }
                 scanner.close();
@@ -92,6 +110,11 @@ public class Client {
     public String getCurrentIP()
     {
         return currentIP;
+    }
+
+    public void sendAnswer(int answer, ObjectOutputStream outStream) throws IOException
+    {
+        outStream.writeInt(answer);
     }
     
 }

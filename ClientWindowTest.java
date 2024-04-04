@@ -9,7 +9,9 @@ public class ClientWindowTest
 	{
 		
 		String currentIP = "10.111.103.120";
-		ClientWindow window = new ClientWindow(new Client(currentIP));
+		Client client = new Client(currentIP);
+		client.run();
+		//ClientWindow window = new ClientWindow(client);
 		
 		
 	}
