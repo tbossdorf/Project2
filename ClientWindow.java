@@ -1,3 +1,5 @@
+package Project2;
+
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -95,6 +97,7 @@ public class ClientWindow implements ActionListener
 			case "Option 4":	// Your code here
 								break;
 			case "Poll":		// Your code here
+				
 								break;
 			case "Submit":		// Your code here
 								break;

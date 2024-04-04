@@ -1,3 +1,6 @@
+package project2;
+
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -20,6 +23,10 @@ public class Queue {
 
     public Poll poll(){
         return queue.poll(); //retreives and removes the head of the queue
+    }
+
+    public BlockingQueue<Poll> getQueue(){
+        return queue; //returns the queue
     }
 }
 
