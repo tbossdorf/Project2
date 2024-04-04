@@ -112,6 +112,9 @@ public class Server {
             System.out.println("UDP Server started");
             byte[] packetBuffer = new byte[2024];
             while (clientHandlers.size() >=1){
+                // for(ClientHandler ch : clientHandlers){
+                    
+                // 
                 DatagramPacket packet = new DatagramPacket(packetBuffer, packetBuffer.length);
                 datagramSocket.receive(packet);
                 System.out.println("Received UDP packet");
@@ -131,7 +134,7 @@ public class Server {
             while (true) {
                 Socket socket = serverSocket.accept();
                 System.out.println("Client connected");
-                ClientHandler clientHandler = new ClientHandler(socket, nums.remove(0), waitQueue.getQueue() );
+                ClientHandler clientHandler = new ClientHandler(socket, nums.remove(0), waitQueue.getQueue(), datagramSocket);
                 clientHandlers.add(clientHandler);
                 if(running){
                     for(ClientHandler ch : clientHandlers){

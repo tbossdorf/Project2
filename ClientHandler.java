@@ -4,6 +4,8 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.Socket;
 import java.util.Scanner;
 import java.util.concurrent.BlockingQueue;
@@ -11,7 +13,8 @@ import java.util.concurrent.BlockingQueue;
 public class ClientHandler implements Runnable{
     
     //initializing
-    private Socket socket; //represents the socket connection with the client
+    private Socket socket; //represents the tcp socket connection with the client
+    private DatagramSocket udpSocket; //represents the udp socket connection with the client
     private ObjectOutputStream outStream; //sends data to client
     private DataInputStream inStream; //receives data from client
     private int correct = -1; //holds the correct answer to the question
@@ -19,13 +22,15 @@ public class ClientHandler implements Runnable{
     private final BlockingQueue<Poll> queue; //a blocking queue that handles polls
     private boolean pollPressed = true; //indicates if client has pressed the poll
 
+    
     //takes three parameters
-    public ClientHandler(Socket socket, int clientID, BlockingQueue<Poll> queue) throws IOException
+    public ClientHandler(Socket socket, int clientID, BlockingQueue<Poll> queue, DatagramSocket udpSocket) throws IOException
     {
         //initializes
         this.socket = socket;
         this.clientID = clientID;
         this.queue = queue;
+        this.udpSocket = udpSocket;
     }
 
     //sends ack to client 
@@ -83,13 +88,25 @@ public class ClientHandler implements Runnable{
         //runs in an infinite loop
         while (true){ //always listening to client
             //reads boolean value from input stream
-            pollPressed = inStream.readBoolean();
-            System.out.println("Client " + clientID + " pressed Poll button:" + pollPressed);
+            //pollPressed = inStream.readBoolean();
+            //System.out.println("Client " + clientID + " pressed Poll button:" + pollPressed);
             
-            if(pollPressed){
-                //used handlePoll
+            //if client has pressed poll button
+            byte[] buffer = new byte[256];
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+            udpSocket.receive(packet);
+            String receivedPacket = new String(packet.getData()).trim();
+            if(receivedPacket.equals("Buzz"))
+            {
+                System.out.println("Buzz received from client " + clientID);
                 handlePoll(questionNum);
             }
+            
+
+            // if(pollPressed){
+            //     //used handlePoll
+            //     handlePoll(questionNum);
+            // }
 
             //uses handleAnswer
             handleAnswer(questionNum);
@@ -145,9 +162,10 @@ public class ClientHandler implements Runnable{
     {
         try{
             initialize();
-            sendQuestions(1);
-            sendID();
-            clientResponse();;
+            clientResponse();
+            // sendQuestions(1);
+            // sendID();
+            // clientResponse();
         } catch (IOException e){
             e.printStackTrace();
         } finally{
