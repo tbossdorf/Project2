@@ -1,4 +1,4 @@
-package Project2;
+
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
@@ -12,13 +12,14 @@ import java.util.concurrent.BlockingQueue;
 
 public class ClientHandler implements Runnable{
     
-    private Socket socket;
-    private ObjectOutputStream outStream;
-    private DataInputStream inStream;
-    private int correct = -1;
-    private final int clientID;
-    private final BlockingQueue<Poll> queue;
-    private boolean pollPressed = true;
+    //initializing
+    private Socket socket; //represents the socket connection with the client
+    private ObjectOutputStream outStream; //sends data to client
+    private DataInputStream inStream; //receives data from client
+    private int correct = -1; //holds the correct answer to the question
+    private final int clientID; //identifies the client
+    private final BlockingQueue<Poll> queue; //a blocking queue that handles polls
+    private boolean pollPressed = true; //indicates if client has pressed the poll
 
 
     public ClientHandler(Socket socket, int clientID, BlockingQueue<Poll> queue) throws IOException
@@ -28,28 +29,39 @@ public class ClientHandler implements Runnable{
         this.queue = queue;
     }
 
+    //sends ack to client 
     private void sendAck(String ack) throws IOException{
+        //writes acknowledgment message to output stream
         outStream.writeObject(ack);
         outStream.flush();
+        //indicates and acknowledgment has been scent and what the acknowledgment was
         System.out.println("Sent acknowledgment to client " + this.clientID + ":" + ack);
     }
 
+    //sends client id to client
     private void sendID() throws IOException{
         outStream.writeInt(this.clientID);
         outStream.flush();
     }
 
+    //initializies input and output streams
     private void initialize() throws IOException {
-        outStream = new ObjectOutputStream(socket.getOutStream());
-        inStream = new DataInputStream(socket.getInStream());
+        outStream = new ObjectOutputStream(socket.getOutputStream());
+        inStream = new DataInputStream(socket.getInputStream());
     }
     
+    //sends questions to client over output stream
     void sendQuestions (int questionNum) throws IOException{
+        //constructs a file path a scanner
         String filePath = "src/Questions/question" + questionNum + ".txt";
         File file = new File(filePath);
+        //reads questions out of a file using
         try(Scanner scanner = new Scanner(file)){
+            //indicates data being sent is a file
             String type = "File";
+            //writes the line to the output stream and sends it to client
             outStream.writeObject(type);
+            //sends questionNum as an interger 
             outStream.writeInt(questionNum);
             int counter = 0;
             while (counter < 5 && scanner.hasNextLine()){
@@ -58,51 +70,61 @@ public class ClientHandler implements Runnable{
                 counter++;
             }
             if (scanner.hasNextInt()){
+                //sets correct answer integer being read to correct variable
                 correct = scanner.nextInt();
             }
+            //flushes output stream to ensure all data is sent
             outStream.flush();
         }
     }
 
+    //handles client responses
     private void clientResponse() throws IOException {
-        while (true){
+        //runs in an infinite loop
+        while (true){ //always listening to client
             int questionNum = 1;
-
-            pollPressed = inStream.readBoolean();
+            //reads a boolean value from input stream
+            pollPressed = inStream.readBoolean(); //indicates whether client has pressed the button
 
             System.out.println("Client " + clientID + " pressed Poll button:" + pollPressed);
-
+            
             if (pollPressed){
-
-                queue.add(new Poll(this.clientID, questionNum));
-                
-                if (!queue.isEmpty() && queue.peek().getClientID() == this.clientID) {
+                //creates a new poll object with clientID and questionNum
+                queue.add(new Poll(this.clientID, questionNum)); //adds poll object to queue
+                //if queue is empty and client is at front sends an ack
+                if (!queue.isEmpty() && queue.peek().getID() == this.clientID) {
                     sendAck("ack");
                     System.out.println("Ack to client " + this.clientID);
                 } else {
+                //if queue is not empty and client is not at front sends an Negative-ack
                     sendAck("negative-ack");
                     System.out.println("Negatuve-ack to client " + this.clientID);
                 }
             }
-    
-            if (!queue.isEmpty() && queue.peek().getClientID() == this.clientID) {
+            //if client is at front of queue and answer is available
+            if (!queue.isEmpty() && queue.peek().getID() == this.clientID) {
                 int answer = inStream.readInt(); //read answer
+                //prints clients chosen answer and correct answer
                 System.out.println("Answer chosen by client " + this.clientID + ": " + answer + ". Correct Answer: " + correct);
-                int score = (answer == correct) ? 10 : -20;
+                //calculates clients score
+                // int score = (answer == correct) ? 10 : -20;
                 // outStream.writeObject("Score");
                 // outStream.writeInt(score);
                 outStream.flush();
             }
+            //increments to handle multiple questions
             questionNum++;
+            //flushes output stream to ensure all data is sent
             outStream.flush();
         }
     }
-
+    //returns socket object stored in Socket
     public Socket getSocket()
     {
         return socket;
     }
 
+    //sends the first set of questions to client
     @Override
     public void run()
     {
@@ -115,6 +137,7 @@ public class ClientHandler implements Runnable{
         }
     }
 
+    //closes the input and output streams
     private void closeStreams(){
         try {
             if (outStream != null) {
@@ -129,11 +152,12 @@ public class ClientHandler implements Runnable{
         }
     }
 
-    public int getClient(){ //get client id
+    public int getClient(){ //gets client id
         return this.clientID;
     }
 
     public void setPressed(boolean pollPressed){
+        //updates the state of pollpressed
         this.pollPressed = pollPressed;
     }
 

@@ -1,4 +1,3 @@
-package Project2;
 
 import java.io.IOException;
 import java.net.Socket;

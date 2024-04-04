@@ -1,13 +1,11 @@
-package Project2;
-
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class Queue {
     //queue stores objects from poll class
     private BlockingQueue<Poll> queue;
 
-    public ConcurrentQueue(){
+    public Queue(){
         //creates an empty queue ready to store poll objects
         queue = new LinkedBlockingQueue<>();
     }

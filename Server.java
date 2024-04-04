@@ -1,5 +1,3 @@
-package Project2;
-
 import java.net.ServerSocket;
 import java.net.DatagramSocket;
 import java.io.BufferedReader;
