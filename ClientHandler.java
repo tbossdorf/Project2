@@ -163,9 +163,9 @@ public class ClientHandler implements Runnable{
         try{
             initialize();
             clientResponse();
-            // sendQuestions(1);
-            // sendID();
-            // clientResponse();
+            sendQuestions(1);
+            sendID();
+            clientResponse();
         } catch (IOException e){
             e.printStackTrace();
         } finally{

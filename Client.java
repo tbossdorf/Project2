@@ -16,13 +16,9 @@ public class Client {
     private DatagramSocket udpSocket;
 
 
-    public Client(String currentIP){
-        this.currentIP = currentIP;
-        
-    }
-
-    public void run()
+    public static void main(String[] args)
     {
+        String currentIP = args[0];
         Scanner scanner = new Scanner(System.in);
         
         //Now, we can pass it our IP from the command line. The IP will be printed on the servers console, which we can copy
@@ -55,7 +51,11 @@ public class Client {
                     {
                         if(message.equals("Buzz"))
                         {
-                            sendBuzz();
+                            String response = "Buzz";
+                            byte[] buffer = response.getBytes();
+                            InetAddress serverAddress = InetAddress.getByName(currentIP);
+                            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, 4321);
+                            udpSocket.send(packet);
                         }
                     }
                 }
