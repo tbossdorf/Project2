@@ -133,12 +133,22 @@ public class ClientWindow implements ActionListener
 			case "Poll":		// Your code here
 				try {
 					client.sendBuzz(client.getUdpSocket(), client.getCurrentIP());
+					
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				} // sends a poll to the server
 								break;
 			case "Submit":		// Your code here
+				if(canChoose)
+				{
+					try {
+						client.sendAnswer(chosen, client.getOutStream());
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
 								break;
 			default:
 								System.out.println("Incorrect Option");

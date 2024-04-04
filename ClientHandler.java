@@ -104,13 +104,16 @@ public class ClientHandler implements Runnable{
             }
             
 
+
             // if(pollPressed){
             //     //used handlePoll
             //     handlePoll(questionNum);
             // }
 
+
             //uses handleAnswer
             handleAnswer(questionNum);
+            
 
             //increments to handle multiple questions
             questionNum++;

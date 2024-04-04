@@ -11,7 +11,7 @@ public class ClientWindowTest
 		String currentIP = "10.111.103.120";
 		Client client = new Client(currentIP);
 		client.run();
-		//ClientWindow window = new ClientWindow(client);
+		ClientWindow window = new ClientWindow(client);
 		
 		
 	}

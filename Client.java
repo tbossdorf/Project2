@@ -20,6 +20,7 @@ public class Client {
     private DatagramSocket udpSocket;
     private ObjectOutputStream outStream; //sends data to clientHandler
     private DataInputStream inStream; //receives data from clientHandler
+    private BufferedReader reader;
 
 
 
@@ -44,7 +45,7 @@ public class Client {
                 DatagramSocket udpSocket = new DatagramSocket(4321);
                 outStream = new ObjectOutputStream(socket.getOutputStream());
                 inStream = new DataInputStream(socket.getInputStream());
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inStream));
+                reader = new BufferedReader(new InputStreamReader(inStream));
                 System.out.println("Connected to server");
                 while(true)
                 {
@@ -116,5 +117,19 @@ public class Client {
     {
         outStream.writeInt(answer);
     }
+
+
+    public ObjectOutputStream getOutStream()
+    {
+        return outStream;
+    }
+
+    public BufferedReader getReader()
+    {
+        return reader;
+    }
+    
+
+
     
 }
