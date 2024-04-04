@@ -1,7 +1,7 @@
 package Project2;
-
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class Queue {
     //queue stores objects from poll class

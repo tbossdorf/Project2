@@ -1,5 +1,4 @@
 package Project2;
-
 public class Poll{
     
     private int questionNum; //number being polled
@@ -10,11 +9,11 @@ public class Poll{
         this.clientID = clientID;
     }
 
-    //allows access to questionNum and client outsdie of the poll class
+    //allows access to questionNum outsdie of the poll class
     public int getquestionNum(){
         return this.questionNum;
     }
-
+    //allows access to clientID outsdie of the poll class
     public int getID(){
         return this.clientID;
     }

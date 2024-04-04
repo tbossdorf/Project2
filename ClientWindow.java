@@ -1,11 +1,14 @@
 package Project2;
-
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.DataInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.TimerTask;
+import java.util.concurrent.BlockingQueue;
 import java.util.Timer;
 import javax.swing.*;
 
@@ -19,7 +22,17 @@ public class ClientWindow implements ActionListener
 	private JLabel timer;
 	private JLabel score;
 	private TimerTask clock;
-	private String	ip;
+	private int chosen;
+
+	private Socket socket; //represents the socket connection with the client
+    private ObjectOutputStream outStream; //sends data to client
+    private DataInputStream inStream; //receives data from client
+    private int clientID; //identifies the client
+	private String questionNum; //identifies the question number
+	private boolean canChoose = true; //tracks if client is allowed to choose answer
+
+	private String ip;
+
 	private JFrame window;
 	private Client client;
 	
@@ -81,6 +94,32 @@ public class ClientWindow implements ActionListener
 		window.setResizable(false);
 	}
 
+	//handles the submit button using ack and nack
+	private void handleAcknowledgment(String acknowledgmentType) {
+        if ("ack".equals(acknowledgmentType)) {
+            // Enable options and submit button
+			setEnabled(true);
+        } else if ("negative-ack".equals(acknowledgmentType)) {
+            // Disable options and submit button
+            setEnabled(false);
+            JOptionPane.showMessageDialog(window, "Not quick enough! You cannot pick answer.");
+        }
+	}
+	//helper method for enabling or disabling the submit button
+	private void setEnabled(boolean enabled){ //boolean indicates that it can be true or false
+		//sets value of canChoose
+		canChoose = enabled;
+		//sets poll and submit to the enabled parameter
+		poll.setEnabled(enabled);
+		submit.setEnabled(enabled);
+		//sets enabled states to the vakues of enabled parameters
+		for (JRadioButton option : options) {
+			option.setEnabled(enabled);
+		}
+	}
+
+	
+
 	// this method is called when you check/uncheck any radio button
 	// this method is called when you press either of the buttons- submit/poll
 	@Override
@@ -92,14 +131,6 @@ public class ClientWindow implements ActionListener
 		String input = e.getActionCommand();  
 		switch(input)
 		{
-			case "Option 1":	// Your code here
-								break;
-			case "Option 2":	// Your code here
-								break;
-			case "Option 3":	// Your code here
-								break;
-			case "Option 4":	// Your code here
-								break;
 			case "Poll":		// Your code here
 				try {
 					client.sendBuzz();
@@ -113,26 +144,6 @@ public class ClientWindow implements ActionListener
 			default:
 								System.out.println("Incorrect Option");
 		}
-		
-		// test code below to demo enable/disable components
-		// DELETE THE CODE BELOW FROM HERE***
-		if(poll.isEnabled())
-		{
-			poll.setEnabled(false);
-			submit.setEnabled(true);
-		}
-		else
-		{
-			poll.setEnabled(true);
-			submit.setEnabled(false);
-		}
-		
-		question.setText("Q2. This is another test problem " + random.nextInt());
-		
-		// you can also enable disable radio buttons
-		options[random.nextInt(4)].setEnabled(false);
-		options[random.nextInt(4)].setEnabled(true);
-		// TILL HERE ***
 		
 	}
 	
