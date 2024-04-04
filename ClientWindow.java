@@ -42,8 +42,6 @@ public class ClientWindow implements ActionListener
 	
 	public ClientWindow(Client client)
 	{
-		this.client = client;
-		client.run();
 		JOptionPane.showMessageDialog(window, "This is a trivia game");
 		window = new JFrame("Trivia");
 		question = new JLabel("Q1. This is a sample question"); // represents the question
@@ -91,6 +89,8 @@ public class ClientWindow implements ActionListener
 		window.setVisible(true);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(false);
+		this.client = client;
+		client.run();
 	}
 
 	//handles the submit button using ack and nack
@@ -133,7 +133,6 @@ public class ClientWindow implements ActionListener
 			case "Poll":		// Your code here
 				try {
 					client.sendBuzz(client.getUdpSocket(), client.getCurrentIP());
-					
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();

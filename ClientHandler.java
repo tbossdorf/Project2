@@ -112,8 +112,9 @@ public class ClientHandler implements Runnable{
 
 
             //uses handleAnswer
-            handleAnswer(questionNum);
             
+            handleAnswer(questionNum);
+
 
             //increments to handle multiple questions
             questionNum++;

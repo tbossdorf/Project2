@@ -27,6 +27,15 @@ public class Client {
     public Client(String currentIP)
     {
         this.currentIP = currentIP;
+        try{
+            socket = new Socket(currentIP, 1234);
+            udpSocket = new DatagramSocket(4321);
+        }
+        catch(IOException e)
+        {
+            System.out.println("Issue with connecting to server: " + e.getMessage());
+        }
+        
     }
 
     public void run()
@@ -41,46 +50,20 @@ public class Client {
             Scanner scanner = new Scanner(System.in);
             try
             {
-                Socket socket = new Socket(currentIP, 1234);
-                DatagramSocket udpSocket = new DatagramSocket(4321);
+                //Socket socket = new Socket(currentIP, 1234);
+                //DatagramSocket udpSocket = new DatagramSocket(4321);
                 outStream = new ObjectOutputStream(socket.getOutputStream());
                 inStream = new DataInputStream(socket.getInputStream());
                 reader = new BufferedReader(new InputStreamReader(inStream));
                 System.out.println("Connected to server");
                 while(true)
                 {
-                    
-                    String message = scanner.nextLine();
-                    if(message.equals("exit"))
-                    {
-                        socket.close();
-                        udpSocket.close();
-                        break;
+                    String ack = reader.readLine();
+                    if(ack == "ack"){
+                        System.out.println("acknowledgment received");
                     }
-                    else if(message.equals(null))
-                    {
-                        
-                        System.out.println("Invalid input, please try again.");
-                    }
-                    else
-                    {
-                        if(message.equals("Buzz"))
-                        System.out.println("Buzzing in...");
-                        {
-                            sendBuzz(udpSocket, currentIP);
-                        }
 
-                        String ack = reader.readLine();
-                        if(ack == "ack"){
-                            System.out.println("You're turn to answer");
-                            System.out.println("Enter an answer:");
-                            String answer = scanner.nextLine();
-                            sendAnswer(Integer.parseInt(answer), outStream);
-                        }
-
-                    }
                 }
-                scanner.close();
             }catch(IOException e)
             {
                 System.out.println("Issue with connecting to server: " + e.getMessage());
@@ -128,7 +111,7 @@ public class Client {
     {
         return reader;
     }
-    
+
 
 
     
