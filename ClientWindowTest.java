@@ -1,4 +1,8 @@
 package Project2;
+
+import javax.swing.*;
+import java.awt.*;
+import Project2.Client;
 public class ClientWindowTest
 {
 	public static void main(String[] args)
