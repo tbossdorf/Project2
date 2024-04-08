@@ -3,6 +3,7 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.DataInputStream;
+import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.io.IOException;
@@ -23,6 +24,7 @@ public class ClientWindow implements ActionListener
 	private JLabel score;
 	private TimerTask clock;
 	private int chosen;
+	private int theScore;
 
 	private Socket socket; //represents the socket connection with the client
     private ObjectOutputStream outStream; //sends data to client
@@ -30,6 +32,9 @@ public class ClientWindow implements ActionListener
     private int clientID; //identifies the client
 	private String questionNum; //identifies the question number
 	private boolean canChoose = true; //tracks if client is allowed to choose answer
+	private boolean buzzed = true; //tracks if client has buzzed
+	private int correct = -1; //holds the correct answer to the question
+	private int currentQuestion = 1;
 
 	private String ip;
 
@@ -44,7 +49,7 @@ public class ClientWindow implements ActionListener
 	{
 		JOptionPane.showMessageDialog(window, "This is a trivia game");
 		window = new JFrame("Trivia");
-		question = new JLabel("Q1. This is a sample question"); // represents the question
+		question = new JLabel("questions"); // represents the question
 		window.add(question);
 		question.setBounds(10, 5, 350, 100);;
 		
@@ -92,6 +97,22 @@ public class ClientWindow implements ActionListener
 		this.client = client;
 		client.run();
 	}
+	public ClientWindow(Socket socket){
+		try {
+			this.socket = socket;
+			inStream = new DataInputStream(socket.getInputStream());
+			correct = inStream.readInt();
+			//sendQuestions(currentQuestion);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void nextQuestion(){
+		currentQuestion++;
+		//clientHandler(currentQuestion);
+	}
+	
 
 	//handles the submit button using ack and nack
 	private void handleAcknowledgment(String acknowledgmentType) {
@@ -118,7 +139,10 @@ public class ClientWindow implements ActionListener
 		}
 	}
 
-	
+	private void updateScore(){
+		score.setText("Score: " + theScore);
+	}
+	              
 
 	// this method is called when you check/uncheck any radio button
 	// this method is called when you press either of the buttons- submit/poll
@@ -131,16 +155,27 @@ public class ClientWindow implements ActionListener
 		switch(input)
 		{
 			case "Poll":		// Your code here
-				try {
+				try{
 					client.sendBuzz(client.getUdpSocket(), client.getCurrentIP());
-					handleAcknowledgment(client.getServerResponse());
-					System.out.println(client.getServerResponse());
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
+				} catch (IOException e1){
 					e1.printStackTrace();
-				} // sends a poll to the server
+				}
 								break;
-			case "Submit":		// Your code here
+			case "Submit":	
+			
+			if(canChoose && buzzed){
+			
+				if (chosen == correct){
+					theScore += 10;
+				} else if (chosen != correct){
+					theScore -= 10;
+				} else{
+					theScore -= 20;
+				}
+				updateScore();
+				canChoose = false;
+				submit.setEnabled(false);
+			}
 				if(canChoose)
 				{
 					try {
@@ -199,5 +234,15 @@ public class ClientWindow implements ActionListener
 			window.repaint();
 		}
 	}
+
+	// main method to run the application
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+				String currentIP = "10.111.121.233";
+                new ClientWindow(new Client(currentIP));
+            }
+        });
+    }
 	
 }
