@@ -102,6 +102,7 @@ public class ClientWindow implements ActionListener
             // Disable options and submit button
             setEnabled(false);
             JOptionPane.showMessageDialog(window, "Not quick enough! You cannot pick answer.");
+			System.out.println("Not quick enough! You cannot pick answer.");
         }
 	}
 	//helper method for enabling or disabling the submit button

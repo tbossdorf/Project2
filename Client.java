@@ -21,14 +21,13 @@ public class Client {
     private ObjectOutputStream outStream; //sends data to clientHandler
     private DataInputStream inStream; //receives data from clientHandler
     private BufferedReader reader;
-    private boolean canChoose; //tracks if client is allowed to choose answer
+    
 
 
 
     public Client(String currentIP)
     {
         this.currentIP = currentIP;
-        canChoose = false;
         try{
             socket = new Socket(currentIP, 1234);
             udpSocket = new DatagramSocket(4321);
@@ -60,11 +59,11 @@ public class Client {
                 System.out.println("Connected to server");
                 while(true)
                 {
+                    System.out.println("Waiting for a response from the server");
                     String response = reader.readLine();
                     if(response.equals("ack"))
                     {
                         System.out.println("Received ack from server");
-                        canChoose = true;
                     }
                     else{
                         System.out.println("Received: " + response);
@@ -102,10 +101,6 @@ public class Client {
         return currentIP;
     }
 
-    public Boolean getCanChoose()
-    {
-        return canChoose;
-    }
 
     public void sendAnswer(int answer, ObjectOutputStream outStream) throws IOException
     {
