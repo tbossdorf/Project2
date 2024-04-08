@@ -182,22 +182,23 @@ public class ClientHandler implements Runnable{
     @Override
     public void run()
     {
+        //int questionNum = 1;
         try{
             initialize();
-            int question = 1;
-            while(true){
-                sendID();
-                clientResponse();
-                sendQuestions(question);
-            }
-            
-            //sendID();
-            //clientResponse();
+            //sendFile("src/Questions/Question" + questionNum + ".txt");
+            sendQuestions(1);
+            sendID();
+            clientResponse();;
         } catch (IOException e){
             e.printStackTrace();
         } finally{
             closeStreams();
         }
+    }
+
+    private void sendFile(String string) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'sendFile'");
     }
 
     //closes the input and output streams

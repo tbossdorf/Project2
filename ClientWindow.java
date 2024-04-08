@@ -102,17 +102,16 @@ public class ClientWindow implements ActionListener
 			this.socket = socket;
 			inStream = new DataInputStream(socket.getInputStream());
 			correct = inStream.readInt();
-			//sendQuestions(currentQuestion);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
+
 	private void nextQuestion(){
 		currentQuestion++;
 		//clientHandler(currentQuestion);
 	}
-	
 
 	//handles the submit button using ack and nack
 	private void handleAcknowledgment(String acknowledgmentType) {
@@ -142,7 +141,7 @@ public class ClientWindow implements ActionListener
 	private void updateScore(){
 		score.setText("Score: " + theScore);
 	}
-	              
+
 
 	// this method is called when you check/uncheck any radio button
 	// this method is called when you press either of the buttons- submit/poll
