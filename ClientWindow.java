@@ -1,3 +1,4 @@
+
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -5,6 +6,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.TimerTask;
 import java.util.concurrent.BlockingQueue;
@@ -34,17 +36,18 @@ public class ClientWindow implements ActionListener
 	private int correct = -1; //holds the correct answer to the question
 	private int currentQuestion = 1;
 
-	
+	private String ip;
+
 	private JFrame window;
+	private Client client;
 	
 	private static SecureRandom random = new SecureRandom();
 	
 	// write setters and getters as you need
 	
-	public ClientWindow()
+	public ClientWindow(Client client)
 	{
 		JOptionPane.showMessageDialog(window, "This is a trivia game");
-		
 		window = new JFrame("Trivia");
 		question = new JLabel("questions"); // represents the question
 		window.add(question);
@@ -91,6 +94,8 @@ public class ClientWindow implements ActionListener
 		window.setVisible(true);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(false);
+		this.client = client;
+		client.run();
 	}
 	public ClientWindow(Socket socket){
 		try {
@@ -103,6 +108,11 @@ public class ClientWindow implements ActionListener
 	}
 
 
+	private void nextQuestion(){
+		currentQuestion++;
+		//clientHandler(currentQuestion);
+	}
+
 	//handles the submit button using ack and nack
 	private void handleAcknowledgment(String acknowledgmentType) {
         if ("ack".equals(acknowledgmentType)) {
@@ -112,6 +122,7 @@ public class ClientWindow implements ActionListener
             // Disable options and submit button
             setEnabled(false);
             JOptionPane.showMessageDialog(window, "Not quick enough! You cannot pick answer.");
+			System.out.println("Not quick enough! You cannot pick answer.");
         }
 	}
 	//helper method for enabling or disabling the submit button
@@ -138,19 +149,16 @@ public class ClientWindow implements ActionListener
 	public void actionPerformed(ActionEvent e)
 	{
 		System.out.println("You clicked " + e.getActionCommand());
-		
 		// input refers to the radio button you selected or button you clicked
 		String input = e.getActionCommand();  
 		switch(input)
 		{
-			case "Poll":		
-
-			if(!buzzed){
-
-				buzzed = true;
-				poll.setEnabled(false);
-			}
-				
+			case "Poll":		// Your code here
+				try{
+					client.sendBuzz(client.getUdpSocket(), client.getCurrentIP());
+				} catch (IOException e1){
+					e1.printStackTrace();
+				}
 								break;
 			case "Submit":	
 			
@@ -167,6 +175,27 @@ public class ClientWindow implements ActionListener
 				canChoose = false;
 				submit.setEnabled(false);
 			}
+				if(canChoose)
+				{
+					try {
+						client.sendAnswer(chosen, client.getOutStream());
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+								break;
+			case "Option 1":		// Your code here
+				chosen = 1;
+								break;
+			case "Option 2":		// Your code here
+				chosen = 2;
+								break;
+			case "Option 3":		// Your code here
+				chosen = 3;
+								break;
+			case "Option 4":		// Your code here
+				chosen = 4;
 								break;
 			default:
 								System.out.println("Incorrect Option");
@@ -209,7 +238,8 @@ public class ClientWindow implements ActionListener
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                new ClientWindow();
+				String currentIP = "10.111.121.233";
+                new ClientWindow(new Client(currentIP));
             }
         });
     }

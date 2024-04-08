@@ -1,3 +1,4 @@
+
 public class Poll{
     
     private int questionNum; //number being polled

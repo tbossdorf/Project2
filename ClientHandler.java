@@ -1,8 +1,11 @@
 
+
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.Socket;
 import java.util.Scanner;
 import java.util.concurrent.BlockingQueue;
@@ -10,21 +13,25 @@ import java.util.concurrent.BlockingQueue;
 public class ClientHandler implements Runnable{
     
     //initializing
-    private Socket socket; //represents the socket connection with the client
+    private Socket socket; //represents the tcp socket connection with the client
+    private DatagramSocket udpSocket; //represents the udp socket connection with the client
     private ObjectOutputStream outStream; //sends data to client
     private DataInputStream inStream; //receives data from client
     private int correct = -1; //holds the correct answer to the question
     private final int clientID; //identifies the client
     private final BlockingQueue<Poll> queue; //a blocking queue that handles polls
     private boolean pollPressed = true; //indicates if client has pressed the poll
+    private boolean answerPressed = false; //indicates if client has pressed the answer
 
+    
     //takes three parameters
-    public ClientHandler(Socket socket, int clientID, BlockingQueue<Poll> queue) throws IOException
+    public ClientHandler(Socket socket, int clientID, BlockingQueue<Poll> queue, DatagramSocket udpSocket) throws IOException
     {
         //initializes
         this.socket = socket;
         this.clientID = clientID;
         this.queue = queue;
+        this.udpSocket = udpSocket;
     }
 
     //sends ack to client 
@@ -83,16 +90,48 @@ public class ClientHandler implements Runnable{
         //runs in an infinite loop
         while (true){ //always listening to client
             //reads boolean value from input stream
-            pollPressed = inStream.readBoolean();
-            System.out.println("Client " + clientID + " pressed Poll button:" + pollPressed);
+            //pollPressed = inStream.readBoolean();
+            //System.out.println("Client " + clientID + " pressed Poll button:" + pollPressed);
             
+            //if client has pressed poll button
+            System.out.println("Waiting for Buzz from client " + clientID);
+            byte[] buffer = new byte[256];
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+            udpSocket.receive(packet);
+            String receivedPacket = new String(packet.getData()).trim();
+            if(receivedPacket.equals("Buzz"))
+            {
+                pollPressed = true;
+                System.out.println("Buzz received from client " + clientID);
+                handlePoll(questionNum);
+            }
+
+
+            if(answerPressed){
+                handleAnswer(questionNum);
+            }
+
+
+
+            if(receivedPacket.equals("Answer"))
+            {
+                answerPressed = true;
+                System.out.println("Answer received from client " + clientID);
+            }
+            
+            
+
+
             if(pollPressed){
                 //used handlePoll
                 handlePoll(questionNum);
             }
 
+
             //uses handleAnswer
-            handleAnswer(questionNum);
+            
+            
+
 
             //increments to handle multiple questions
             questionNum++;
@@ -103,8 +142,8 @@ public class ClientHandler implements Runnable{
     //when client presses poll button
     private void handlePoll (int questionNum) throws IOException{
         //creates a new poll object with clientID and questionNum
-        queue.add(new Poll(this.clientID, questionNum)); //adds poll object to queue
-
+        queue.add(new Poll(questionNum, this.clientID)); //adds poll object to queue
+        System.out.println("Head client in queue: " + queue.peek().getID() + " Question number: " + queue.peek().getquestionNum());
         //if queue is empty and client is at front sends an ack
         if (!queue.isEmpty() && queue.peek().getID() == this.clientID) {
             sendAck("ack");
