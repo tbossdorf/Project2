@@ -143,8 +143,10 @@ public class ClientHandler implements Runnable{
     @Override
     public void run()
     {
+        //int questionNum = 1;
         try{
             initialize();
+            //sendFile("src/Questions/Question" + questionNum + ".txt");
             sendQuestions(1);
             sendID();
             clientResponse();;
@@ -153,6 +155,11 @@ public class ClientHandler implements Runnable{
         } finally{
             closeStreams();
         }
+    }
+
+    private void sendFile(String string) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'sendFile'");
     }
 
     //closes the input and output streams
