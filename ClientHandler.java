@@ -21,6 +21,7 @@ public class ClientHandler implements Runnable{
     private final int clientID; //identifies the client
     private final BlockingQueue<Poll> queue; //a blocking queue that handles polls
     private boolean pollPressed = true; //indicates if client has pressed the poll
+    private boolean answerPressed = false; //indicates if client has pressed the answer
 
     
     //takes three parameters
@@ -103,6 +104,7 @@ public class ClientHandler implements Runnable{
                 handlePoll(questionNum);
             }
             
+            
 
 
             // if(pollPressed){
@@ -113,7 +115,7 @@ public class ClientHandler implements Runnable{
 
             //uses handleAnswer
             
-            handleAnswer(questionNum);
+            
 
 
             //increments to handle multiple questions

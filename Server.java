@@ -133,7 +133,6 @@ public class Server {
                 System.out.println("Client connected");
                 ClientHandler clientHandler = new ClientHandler(socket, nums.remove(0), waitQueue.getQueue(), datagramSocket);
                 clientHandlers.add(clientHandler);
-                
                 for(ClientHandler ch : clientHandlers){
                     executor.execute(ch);
                 }
