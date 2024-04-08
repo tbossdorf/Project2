@@ -100,18 +100,31 @@ public class ClientHandler implements Runnable{
             String receivedPacket = new String(packet.getData()).trim();
             if(receivedPacket.equals("Buzz"))
             {
+                pollPressed = true;
                 System.out.println("Buzz received from client " + clientID);
                 handlePoll(questionNum);
             }
-            
+
+
+            if(answerPressed){
+                handleAnswer(questionNum);
+            }
+
+
+
+            if(receivedPacket.equals("Answer"))
+            {
+                answerPressed = true;
+                System.out.println("Answer received from client " + clientID);
+            }
             
             
 
 
-            // if(pollPressed){
-            //     //used handlePoll
-            //     handlePoll(questionNum);
-            // }
+            if(pollPressed){
+                //used handlePoll
+                handlePoll(questionNum);
+            }
 
 
             //uses handleAnswer
@@ -144,22 +157,17 @@ public class ClientHandler implements Runnable{
     //client has submitted an answer
     private void handleAnswer(int questionNum) throws IOException{
         //if client is at front of queue and answer is available
-        while(true){
-            if(inStream.readInt() >= -1){
-                if (!queue.isEmpty() && queue.peek().getID() == this.clientID) {
-                    int answer = inStream.readInt(); //read answer
-                    //prints clients chosen answer and correct answer
-                    System.out.println("Answer chosen by client " + this.clientID + ": " + answer + ". Correct Answer: " + correct);
-
-                    //calculates clients score
-                    int score = (answer == correct) ? 10 : -20;
-                    outStream.writeObject("Score");
-                    outStream.writeInt(score);
-
-                    //flushes output stream to ensure all data is sent
-                    outStream.flush();
-                    break;
-                }
+        if(inStream.readInt() >= -1){
+            if (!queue.isEmpty() && queue.peek().getID() == this.clientID) {
+                int answer = inStream.readInt(); //read answer
+                //prints clients chosen answer and correct answer
+                System.out.println("Answer chosen by client " + this.clientID + ": " + answer + ". Correct Answer: " + correct);
+                //calculates clients score
+                int score = (answer == correct) ? 10 : -20;
+                outStream.writeObject("Score");
+                outStream.writeInt(score);
+                //flushes output stream to ensure all data is sent
+                outStream.flush();
             }
         }
     }
@@ -176,8 +184,10 @@ public class ClientHandler implements Runnable{
         try{
             initialize();
 
-            
-            clientResponse();
+            while(true){
+                sendID();
+                clientResponse();
+            }
             //sendQuestions(1);
             //sendID();
             //clientResponse();
