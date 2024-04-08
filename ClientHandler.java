@@ -183,12 +183,13 @@ public class ClientHandler implements Runnable{
     {
         try{
             initialize();
-
+            int question = 1;
             while(true){
                 sendID();
                 clientResponse();
+                sendQuestions(question);
             }
-            //sendQuestions(1);
+            
             //sendID();
             //clientResponse();
         } catch (IOException e){

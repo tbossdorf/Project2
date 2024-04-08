@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.DatagramPacket;
@@ -19,8 +20,10 @@ public class Client {
     private Socket socket;
     private DatagramSocket udpSocket;
     private ObjectOutputStream outStream; //sends data to clientHandler
-    private DataInputStream inStream; //receives data from clientHandler
+    //private ObjectInputStream inStream; //receives data from clientHandler
     private BufferedReader reader;
+    private String response;
+    
     
 
 
@@ -31,6 +34,7 @@ public class Client {
         try{
             socket = new Socket(currentIP, 1234);
             udpSocket = new DatagramSocket(4321);
+            
         }
         catch(IOException e)
         {
@@ -49,30 +53,47 @@ public class Client {
         if(currentIP != null)
         {
             Scanner scanner = new Scanner(System.in);
-            try
-            {
+            
                 //Socket socket = new Socket(currentIP, 1234);
                 //DatagramSocket udpSocket = new DatagramSocket(4321);
+                
+                
+            try{
                 outStream = new ObjectOutputStream(socket.getOutputStream());
-                inStream = new DataInputStream(socket.getInputStream());
-                reader = new BufferedReader(new InputStreamReader(inStream));
+                ObjectInputStream inStream = new ObjectInputStream(socket.getInputStream());
+                reader = new BufferedReader(new java.io.InputStreamReader(inStream));
                 System.out.println("Connected to server");
                 while(true)
                 {
-                    System.out.println("Waiting for a response from the server");
-                    String response = reader.readLine();
-                    if(response.equals("ack"))
+                    try{
+                       String response = (String) inStream.readObject();
+                        if(response == "ack")
+                        {
+                            System.out.println("ack recieved");
+                        }
+                        else if(response.equals("nack")){
+                            System.out.println("nack recieved");
+                        }
+                        else{
+                            //System.out.println("Server response: " + getServerResponse());
+                        }
+                    }catch(IOException e)
                     {
-                        System.out.println("Received ack from server");
+                       // System.out.println("Error reading from input stream");
+                    }catch(ClassNotFoundException e)
+                    {
+                        //System.out.println("Class not found when reading from input stream");
+                        //e.printStackTrace();
                     }
-                    else{
-                        System.out.println("Received: " + response);
-                    }
+                    //System.out.println("Server response: " + this.response);
+
+                    
+                    
                 }
-            }catch(IOException e)
-            {
-                System.out.println("Issue with connecting to server: " + e.getMessage());
+            }catch(IOException e){
+                System.out.println("Error reading from input stream");
             }
+            
         }else
         {
             System.out.println("Please enter an IP into the command line as an arg to connect to the server.");
@@ -118,9 +139,24 @@ public class Client {
         return reader;
     }
 
-    public String getServerResponse() throws IOException
+    // public ObjectInputStream getInStream()
+    // {
+    //     return inStream;
+    // }
+
+    public String getServerResponse()
     {
-        return reader.readLine();
+        String response = "";
+        // try {
+        //     response = (String) inStream.readObject();
+        //     return response;
+        // } catch (IOException e) {
+        //     //System.out.println("Error reading from input stream");
+        // } catch (ClassNotFoundException e) {
+        //     //System.out.println("Class not found when reading from input stream");
+        //     //e.printStackTrace();
+        // }
+        return response;
     }
 
 
