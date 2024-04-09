@@ -1,3 +1,5 @@
+package Project2;
+
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -19,9 +21,13 @@ public class Client {
     private Socket socket;
     private DatagramSocket udpSocket;
     private ObjectOutputStream outStream; //sends data to clientHandler
-    //private ObjectInputStream inStream; //receives data from clientHandler
+    private ObjectInputStream inStream; //receives data from clientHandler
     private BufferedReader reader;
-    private String response;
+    private String response = "";
+    private String windowInput;
+    private int selectedAnwser;
+    private String[] currentQuestions;
+    private boolean questionsLoaded = false;
     
     
 
@@ -33,7 +39,9 @@ public class Client {
         try{
             socket = new Socket(currentIP, 1234);
             udpSocket = new DatagramSocket(4321);
-            
+            outStream = new ObjectOutputStream(socket.getOutputStream());
+            inStream = new ObjectInputStream(socket.getInputStream());
+            //reader = new BufferedReader(new java.io.InputStreamReader(inStream));
         }
         catch(IOException e)
         {
@@ -57,41 +65,101 @@ public class Client {
                 //DatagramSocket udpSocket = new DatagramSocket(4321);
                 
                 
-            try{
-                outStream = new ObjectOutputStream(socket.getOutputStream());
-                ObjectInputStream inStream = new ObjectInputStream(socket.getInputStream());
-                reader = new BufferedReader(new java.io.InputStreamReader(inStream));
+                
                 System.out.println("Connected to server");
                 while(true)
                 {
-                    try{
-                       String response = (String) inStream.readObject();
-                        if(response == "ack")
-                        {
-                            System.out.println("ack recieved");
-                        }
-                        else if(response.equals("nack")){
-                            System.out.println("nack recieved");
-                        }
-                        else{
-                            //System.out.println("Server response: " + getServerResponse());
-                        }
-                    }catch(IOException e)
+                    if(!questionsLoaded)
                     {
-                       // System.out.println("Error reading from input stream");
-                    }catch(ClassNotFoundException e)
-                    {
+                        readQuestions();
+                    }
+                    
+
+                    // if(getWindowInput() == "Buzz")
+                    // {
+                    //     try{
+                    //         sendBuzz(getUdpSocket(), getCurrentIP());
+                    //     }catch(IOException e)
+                    //     {
+                    //         System.out.println("Error sending buzz to server");
+                    //     }
+                    // }
+                    // else if(getWindowInput() != null && getWindowInput().contains("@"))
+                    // {
+                    //     System.out.println("Answer recieved");
+                    //     try{
+                    //         sendAnswer(getWindowInput(), getOutStream());
+                    //         setWindowInput(null);
+                    //     }catch(IOException e)
+                    //     {
+                    //         System.out.println("Error sending answer to server");
+                    //     }
+                    // }
+
+
+
+                    String serverResponse = "";
+                    try {
+                        inStream.read();
+                        serverResponse = (String) inStream.readObject();
+                    } catch (IOException e) {
+                        //System.out.println("Error reading from input stream");
+                        //e.printStackTrace();
+                    }
+                    catch (ClassNotFoundException e) {
                         //System.out.println("Class not found when reading from input stream");
                         //e.printStackTrace();
                     }
-                    //System.out.println("Server response: " + this.response);
+                    catch (Exception e) {
+                        //System.out.println("Error reading from input stream");
+                        //e.printStackTrace();
+                    }
+
+                
+                    if(serverResponse.equals("ack")){
+                        System.out.println("ack recieved");
+                        this.response = "ack";
+                        break;
+                    }else if(serverResponse.equals("nack")){
+                        System.out.println("nack recieved");
+                        this.response = "nack";
+                        break;
+                    }
+
+                    
+                    
+                    
+
+
+
+
+
+                    // try{
+                    //    String response = (String) inStream.readObject();
+                    //     if(response == "ack")
+                    //     {
+                    //         System.out.println("ack recieved");
+                    //     }
+                    //     else if(response.equals("nack")){
+                    //         System.out.println("nack recieved");
+                    //     }
+                    //     else{
+                    //         //System.out.println("Server response: " + getServerResponse());
+                    //     }
+                    // }catch(IOException e)
+                    // {
+                    //    // System.out.println("Error reading from input stream");
+                    // }catch(ClassNotFoundException e)
+                    // {
+                    //     //System.out.println("Class not found when reading from input stream");
+                    //     //e.printStackTrace();
+                    // }
+                    // //System.out.println("Server response: " + this.response);
 
                     
                     
                 }
-            }catch(IOException e){
-                System.out.println("Error reading from input stream");
-            }
+            
             
         }else
         {
@@ -116,15 +184,53 @@ public class Client {
         return udpSocket;
     }
 
+
+    public Socket getSocket(){
+        return socket;
+    }
+
     public String getCurrentIP()
     {
         return currentIP;
     }
 
+    public void readQuestions()
+    {
+        try {
+            String[] questions = (String[]) inStream.readObject();
+            System.out.println("Questions recieved");
+            currentQuestions = questions;
+            System.out.println(currentQuestions[5]);
+            questionsLoaded = true;
+            // Now questions contains the array sent by the server
+        } catch (IOException e) {
+            // Handle IOException
+            
+        } catch (ClassNotFoundException e) {
+            // Handle ClassNotFoundException
+        }
+    }
+
+    public String[] getQuestions()
+    {
+        return currentQuestions;
+    }
+
+    public void updateScore(int score)
+    {
+        try{
+            outStream.writeUTF("Score: " + score);
+            outStream.flush();
+        }catch(IOException e){
+            System.out.println("Error updating score");
+        }
+    }
+
 
     public void sendAnswer(int answer, ObjectOutputStream outStream) throws IOException
     {
-        outStream.writeInt(answer);
+        outStream.writeUTF("@"+answer);
+        outStream.flush();
     }
 
 
@@ -143,19 +249,20 @@ public class Client {
     //     return inStream;
     // }
 
-    public String getServerResponse()
-    {
-        String response = "";
-        // try {
-        //     response = (String) inStream.readObject();
-        //     return response;
-        // } catch (IOException e) {
-        //     //System.out.println("Error reading from input stream");
-        // } catch (ClassNotFoundException e) {
-        //     //System.out.println("Class not found when reading from input stream");
-        //     //e.printStackTrace();
-        // }
+    public String getServerResponse(){
+    
         return response;
+    }
+
+
+    public void setWindowInput(String input)
+    {
+        this.windowInput = input;
+    }
+
+    private String getWindowInput()
+    {
+        return windowInput;
     }
 
 

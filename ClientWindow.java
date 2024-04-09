@@ -1,3 +1,5 @@
+package Project2;
+
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -53,17 +55,6 @@ public class ClientWindow implements ActionListener
 		window.add(question);
 		question.setBounds(10, 5, 350, 100);;
 		
-		options = new JRadioButton[4];
-		optionGroup = new ButtonGroup();
-		for(int index=0; index<options.length; index++)
-		{
-			options[index] = new JRadioButton("Option " + (index+1));  // represents an option
-			// if a radio button is clicked, the event would be thrown to this class to handle
-			options[index].addActionListener(this);
-			options[index].setBounds(10, 110+(index*20), 350, 20);
-			window.add(options[index]);
-			optionGroup.add(options[index]);
-		}
 
 		timer = new JLabel("TIMER");  // represents the countdown shown on the window
 		timer.setBounds(250, 250, 100, 20);
@@ -96,7 +87,29 @@ public class ClientWindow implements ActionListener
 		window.setResizable(false);
 		this.client = client;
 		client.run();
+
+		options = new JRadioButton[4];
+		optionGroup = new ButtonGroup();
+		
+		for(int index=0; index<options.length; index++)
+		{
+			options[index] = new JRadioButton("Option " + (index+1));  // represents an option
+			// if a radio button is clicked, the event would be thrown to this class to handle
+			options[index].addActionListener(this);
+			options[index].setBounds(10, 110+(index*20), 350, 20);
+			window.add(options[index]);
+			optionGroup.add(options[index]);
+		}
+
+		String[] questions = client.getQuestions();
+		question.setText(questions[0]);
+		for (int i = 0; i < 4; i++){
+			options[i].setText(questions[i+1]);
+		}
+		correct = Integer.parseInt(questions[5]);
 	}
+	
+
 	public ClientWindow(Socket socket){
 		try {
 			this.socket = socket;
@@ -107,6 +120,15 @@ public class ClientWindow implements ActionListener
 		}
 	}
 
+
+	private void updateQuestions(){
+		String[] questions = client.getQuestions();
+		question.setText(questions[0]);
+		for (int i = 0; i < 4; i++){
+			options[i].setText(questions[i+1]);
+		}
+		correct = Integer.parseInt(questions[5]);
+	}
 
 	private void nextQuestion(){
 		currentQuestion++;
@@ -148,42 +170,53 @@ public class ClientWindow implements ActionListener
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
-		System.out.println("You clicked " + e.getActionCommand());
+		//System.out.println("You clicked " + e.getActionCommand());
 		// input refers to the radio button you selected or button you clicked
 		String input = e.getActionCommand();  
 		switch(input)
 		{
-			case "Poll":		// Your code here
+			case "Poll":	
+			
+			
+				// buzzed = true;
+				// client.setWindowInput("Buzz");
+				// handleAcknowledgment(client.getServerResponse());
+				
+
 				try{
 					client.sendBuzz(client.getUdpSocket(), client.getCurrentIP());
+					buzzed = true;
+					System.out.println(client.getServerResponse());
+					handleAcknowledgment(client.getServerResponse());
 				} catch (IOException e1){
 					e1.printStackTrace();
 				}
 								break;
 			case "Submit":	
 			
-			if(canChoose && buzzed){
-			
-				if (chosen == correct){
-					theScore += 10;
-				} else if (chosen != correct){
-					theScore -= 10;
-				} else{
-					theScore -= 20;
-				}
-				updateScore();
-				canChoose = false;
-				submit.setEnabled(false);
-			}
-				if(canChoose)
-				{
-					try {
-						client.sendAnswer(chosen, client.getOutStream());
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+				if(canChoose && buzzed){
+					if (chosen == correct){
+						theScore += 10;
+					} else if (chosen != correct){
+						theScore -= 10;
+					} else{
+						theScore -= 20;
 					}
+					updateScore();
+					try{
+						client.sendAnswer( chosen, client.getOutStream());
+					}
+					catch(IOException e1){
+
+					}
+					
+					client.updateScore(theScore);
+					client.setWindowInput("@"+chosen);
+					canChoose = false;
+					submit.setEnabled(false);
+					updateQuestions();
 				}
+					
 								break;
 			case "Option 1":		// Your code here
 				chosen = 1;
@@ -198,7 +231,7 @@ public class ClientWindow implements ActionListener
 				chosen = 4;
 								break;
 			default:
-								System.out.println("Incorrect Option");
+								System.out.println(chosen == correct);
 		}
 		
 	}
@@ -214,6 +247,7 @@ public class ClientWindow implements ActionListener
 		@Override
 		public void run()
 		{
+			
 			if(duration < 0)
 			{
 				timer.setText("Timer expired");
