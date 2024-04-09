@@ -23,6 +23,7 @@ public class ClientHandler implements Runnable{
     private boolean pollPressed = true; //indicates if client has pressed the poll
     private boolean answerPressed = false; //indicates if client has pressed the answer
     private int score;
+    private boolean questionAnswered = false;
 
     
     //takes three parameters
@@ -87,6 +88,10 @@ public class ClientHandler implements Runnable{
         }
     }
 
+
+    public boolean questionAnswered(){
+        return questionAnswered;
+    }
     
 
     //handles client responses
@@ -112,15 +117,11 @@ public class ClientHandler implements Runnable{
             }
 
 
-            if(answerPressed){
-                handleAnswer(questionNum);
-            }
-
 
 
             if(inStream.readUTF().substring(0, 1) == "@"){
                 System.out.println("Answer received from client " + clientID);
-                handleAnswer(questionNum);
+                handleAnswer(questionNum, inStream.readUTF().substring(1, 2));
             }
            
             
@@ -165,19 +166,20 @@ public class ClientHandler implements Runnable{
     }
     
     //client has submitted an answer
-    private void handleAnswer(int questionNum) throws IOException{
+    private void handleAnswer(int questionNum, String clientAnswer) throws IOException{
         //if client is at front of queue and answer is available
         if (!queue.isEmpty() && queue.peek().getID() == this.clientID) {
-            int answer = Integer.parseInt(inStream.readUTF().substring(1, 2)); //read answer
+            int answer = Integer.parseInt(clientAnswer); //read answer
             //prints clients chosen answer and correct answer
             System.out.println("Answer chosen by client " + this.clientID + ": " + answer + ". Correct Answer: " + correct);
             //calculates clients score
             int score = (answer == correct) ? 10 : -10;
             if(answer == correct){
-
+                questionAnswered = true;
             }
             outStream.writeObject("Score");
             outStream.writeInt(score);
+            
 
             //flushes output stream to ensure all data is sent
             outStream.flush();

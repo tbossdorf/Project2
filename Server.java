@@ -147,10 +147,13 @@ public class Server {
                     for(ClientHandler ch : clientHandlers){
                         executor.execute(ch);
                         ch.sendQuestions(currentQuestion);
+                        if(ch.questionAnswered()){
+                            currentQuestion++;
+                        }
                     }
-                    if(scanner.nextLine().equals("Next")){
-                        currentQuestion++;
-                    }
+                    // if(scanner.nextLine().equals("Next")){
+                    //     currentQuestion++;
+                    // }
                        
                 }else if(!gameRunning && scanner.nextLine().equals("End")){
                     for(ClientHandler ch : clientHandlers){
