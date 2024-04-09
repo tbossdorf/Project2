@@ -8,7 +8,7 @@ public class ClientWindowTest
 {
 	public static void main(String[] args)
 	{
-		String currentIP = "10.111.121.233";
+		String currentIP = "10.111.103.120";
 		Client client = new Client(currentIP);
 		ClientWindow window = new ClientWindow(client);
 	}

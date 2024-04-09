@@ -67,13 +67,13 @@ public class ClientHandler implements Runnable{
             //indicates data being sent is a file
             String type = "File";
             //writes the line to the output stream and sends it to client
-            outStream.writeUTF(type);
+            outStream.writeObject(type);
+            outStream.flush();
             //sends questionNum as an interger 
-            questions[0] = "+"+questionNum;
             int counter = 0;
             while (counter < 5 && scanner.hasNextLine()){
                 String line = scanner.nextLine();
-                questions[counter+1] = line;
+                questions[counter] = line;
                 counter++;
             }
             if (scanner.hasNextInt()){

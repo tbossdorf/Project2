@@ -27,6 +27,7 @@ public class Client {
     private String windowInput;
     private int selectedAnwser;
     private String[] currentQuestions;
+    private boolean questionsLoaded = false;
     
     
 
@@ -68,27 +69,32 @@ public class Client {
                 System.out.println("Connected to server");
                 while(true)
                 {
+                    if(!questionsLoaded)
+                    {
+                        readQuestions();
+                    }
+                    
 
-                    if(getWindowInput() == "Buzz")
-                    {
-                        try{
-                            sendBuzz(getUdpSocket(), getCurrentIP());
-                        }catch(IOException e)
-                        {
-                            System.out.println("Error sending buzz to server");
-                        }
-                    }
-                    else if(getWindowInput() != null && getWindowInput().contains("@"))
-                    {
-                        System.out.println("Answer recieved");
-                        try{
-                            sendAnswer(getWindowInput(), getOutStream());
-                            setWindowInput(null);
-                        }catch(IOException e)
-                        {
-                            System.out.println("Error sending answer to server");
-                        }
-                    }
+                    // if(getWindowInput() == "Buzz")
+                    // {
+                    //     try{
+                    //         sendBuzz(getUdpSocket(), getCurrentIP());
+                    //     }catch(IOException e)
+                    //     {
+                    //         System.out.println("Error sending buzz to server");
+                    //     }
+                    // }
+                    // else if(getWindowInput() != null && getWindowInput().contains("@"))
+                    // {
+                    //     System.out.println("Answer recieved");
+                    //     try{
+                    //         sendAnswer(getWindowInput(), getOutStream());
+                    //         setWindowInput(null);
+                    //     }catch(IOException e)
+                    //     {
+                    //         System.out.println("Error sending answer to server");
+                    //     }
+                    // }
 
 
 
@@ -99,9 +105,13 @@ public class Client {
                     } catch (IOException e) {
                         //System.out.println("Error reading from input stream");
                         //e.printStackTrace();
-                    } 
+                    }
                     catch (ClassNotFoundException e) {
                         //System.out.println("Class not found when reading from input stream");
+                        //e.printStackTrace();
+                    }
+                    catch (Exception e) {
+                        //System.out.println("Error reading from input stream");
                         //e.printStackTrace();
                     }
 
@@ -116,15 +126,7 @@ public class Client {
                         break;
                     }
 
-                    try {
-                        String waitForFile = inStream.readUTF();
-                        if(waitForFile == "file"){
-                            currentQuestions = (String[]) inStream.readObject();
-                            System.out.println(currentQuestions);
-                        }
-                    } catch (Exception e) {
-                        // TODO: handle exception
-                    }
+                    
                     
                     
 
@@ -192,12 +194,26 @@ public class Client {
         return currentIP;
     }
 
+    public void readQuestions()
+    {
+        try {
+            String[] questions = (String[]) inStream.readObject();
+            System.out.println("Questions recieved");
+            currentQuestions = questions;
+            System.out.println(currentQuestions[5]);
+            questionsLoaded = true;
+            // Now questions contains the array sent by the server
+        } catch (IOException e) {
+            // Handle IOException
+            
+        } catch (ClassNotFoundException e) {
+            // Handle ClassNotFoundException
+        }
+    }
 
     public String[] getQuestions()
     {
-        String[] questions = new String[5];
-       
-        return questions;
+        return currentQuestions;
     }
 
     public void updateScore(int score)
@@ -211,9 +227,9 @@ public class Client {
     }
 
 
-    public void sendAnswer(String answer, ObjectOutputStream outStream) throws IOException
+    public void sendAnswer(int answer, ObjectOutputStream outStream) throws IOException
     {
-        outStream.writeUTF(answer);
+        outStream.writeUTF("@"+answer);
         outStream.flush();
     }
 

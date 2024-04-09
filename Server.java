@@ -138,6 +138,7 @@ public class Server {
                 System.out.println("Client connected");
                 ClientHandler clientHandler = new ClientHandler(socket, nums.remove(0), waitQueue.getQueue(), datagramSocket);
                 clientHandlers.add(clientHandler);
+                Scanner scanner = new Scanner(System.in); 
                 if(clientHandlers.size() == 1){
                     gameRunning = true;
                 }
@@ -146,6 +147,9 @@ public class Server {
                     for(ClientHandler ch : clientHandlers){
                         executor.execute(ch);
                         ch.sendQuestions(currentQuestion);
+                    }
+                    if(scanner.nextLine().equals("Next")){
+                        currentQuestion++;
                     }
                     
                     
@@ -167,6 +171,7 @@ public class Server {
                     for(String s : clientScores){
                         System.out.println(s);
                     }
+                    scanner.close();
                     break;
 
 
