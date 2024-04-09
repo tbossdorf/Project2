@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
@@ -46,6 +47,8 @@ public class Server {
     private boolean running;
     private ArrayList<Integer> nums;
     private Queue waitQueue;
+    private boolean gameRunning = false;
+    private ArrayList<String> clientScores = new ArrayList<>();
 
     public Server(){
         clientHandlers = Collections.synchronizedList(new ArrayList<>());
@@ -133,9 +136,41 @@ public class Server {
                 System.out.println("Client connected");
                 ClientHandler clientHandler = new ClientHandler(socket, nums.remove(0), waitQueue.getQueue(), datagramSocket);
                 clientHandlers.add(clientHandler);
-                for(ClientHandler ch : clientHandlers){
-                    executor.execute(ch);
+                if(clientHandlers.size() == 1){
+                    gameRunning = true;
                 }
+
+                if(gameRunning){
+                    for(ClientHandler ch : clientHandlers){
+                        executor.execute(ch);
+                    }
+                }else{
+                    for(ClientHandler ch : clientHandlers){
+                        String names = ch.getClient() + ":" + ch.getScore();
+                        clientScores.add(names);
+                    }
+
+                    Collections.sort(clientScores, new Comparator<String>() {
+                        @Override
+                        public int compare(String s1, String s2) {
+                            int score1 = Integer.parseInt(s1.split(":")[1]);
+                            int score2 = Integer.parseInt(s2.split(":")[1]);
+                            return Integer.compare(score1, score2);
+                        }
+                    });
+
+                    for(String s : clientScores){
+                        System.out.println(s);
+                    }
+                    break;
+
+
+
+                }
+
+                
+
+                
                 
                 
             }

@@ -22,6 +22,7 @@ public class ClientHandler implements Runnable{
     private final BlockingQueue<Poll> queue; //a blocking queue that handles polls
     private boolean pollPressed = true; //indicates if client has pressed the poll
     private boolean answerPressed = false; //indicates if client has pressed the answer
+    private int score;
 
     
     //takes three parameters
@@ -113,13 +114,17 @@ public class ClientHandler implements Runnable{
 
 
 
-            if(receivedPacket.equals("Answer"))
-            {
-                answerPressed = true;
+            if(inStream.readUTF().substring(0, 1) == "@"){
                 System.out.println("Answer received from client " + clientID);
+                handleAnswer(questionNum);
             }
+           
             
-            
+            if(inStream.readUTF().substring(0, 6) == "Score:"){
+                System.out.println("Score received from client " + clientID);
+                this.score = Integer.parseInt(inStream.readUTF().substring(6, 7));
+                System.out.println("Score: " + score);
+            }
 
 
             if(pollPressed){
@@ -159,10 +164,9 @@ public class ClientHandler implements Runnable{
     private void handleAnswer(int questionNum) throws IOException{
         //if client is at front of queue and answer is available
         if (!queue.isEmpty() && queue.peek().getID() == this.clientID) {
-            int answer = inStream.readInt(); //read answer
+            int answer = Integer.parseInt(inStream.readUTF().substring(1, 2)); //read answer
             //prints clients chosen answer and correct answer
             System.out.println("Answer chosen by client " + this.clientID + ": " + answer + ". Correct Answer: " + correct);
-
             //calculates clients score
             int score = (answer == correct) ? 10 : -10;
             outStream.writeObject("Score");
@@ -182,13 +186,13 @@ public class ClientHandler implements Runnable{
     @Override
     public void run()
     {
-        //int questionNum = 1;
+        int questionNum = 1;
         try{
             initialize();
-            //sendFile("src/Questions/Question" + questionNum + ".txt");
-            sendQuestions(1);
+            sendFile("Project2/Questions/Question" + questionNum + ".txt");
+            sendQuestions(questionNum);
             sendID();
-            clientResponse();;
+            clientResponse();
         } catch (IOException e){
             e.printStackTrace();
         } finally{
@@ -223,6 +227,11 @@ public class ClientHandler implements Runnable{
     public void setPressed(boolean pollPressed){
         //updates the state of pollpressed
         this.pollPressed = pollPressed;
+    }
+
+
+    public int getScore(){
+        return score;
     }
 
 }

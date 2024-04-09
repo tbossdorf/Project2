@@ -148,42 +148,45 @@ public class ClientWindow implements ActionListener
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
-		System.out.println("You clicked " + e.getActionCommand());
+		//System.out.println("You clicked " + e.getActionCommand());
 		// input refers to the radio button you selected or button you clicked
 		String input = e.getActionCommand();  
 		switch(input)
 		{
-			case "Poll":		// Your code here
+			case "Poll":	
+			
+			
+				// buzzed = true;
+				// client.setWindowInput("Buzz");
+				// handleAcknowledgment(client.getServerResponse());
+				
+
 				try{
 					client.sendBuzz(client.getUdpSocket(), client.getCurrentIP());
+					buzzed = true;
+					System.out.println(client.getServerResponse());
+					handleAcknowledgment(client.getServerResponse());
 				} catch (IOException e1){
 					e1.printStackTrace();
 				}
 								break;
 			case "Submit":	
 			
-			if(canChoose && buzzed){
-			
-				if (chosen == correct){
-					theScore += 10;
-				} else if (chosen != correct){
-					theScore -= 10;
-				} else{
-					theScore -= 20;
-				}
-				updateScore();
-				canChoose = false;
-				submit.setEnabled(false);
-			}
-				if(canChoose)
-				{
-					try {
-						client.sendAnswer(chosen, client.getOutStream());
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+				if(canChoose && buzzed){
+					if (chosen == correct){
+						theScore += 10;
+					} else if (chosen != correct){
+						theScore -= 10;
+					} else{
+						theScore -= 20;
 					}
+					updateScore();
+					client.updateScore(theScore);
+					client.setWindowInput("@"+chosen);
+					canChoose = false;
+					submit.setEnabled(false);
 				}
+					
 								break;
 			case "Option 1":		// Your code here
 				chosen = 1;
