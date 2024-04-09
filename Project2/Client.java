@@ -69,7 +69,10 @@ public class Client {
                 System.out.println("Connected to server");
                 while(true)
                 {
-                    readQuestions();
+                    if(questionsLoaded == false){
+                        readQuestions();
+                    }
+                    
                     
                     
 
@@ -200,7 +203,7 @@ public class Client {
             currentQuestions = questions;
             System.out.println(currentQuestions[5]);
             //questionNumber = Integer.parseInt(currentQuestions[0]);
-            //questionsLoaded = true;
+            questionsLoaded = true;
             // Now questions contains the array sent by the server
         } catch (IOException e) {
             // Handle IOException
