@@ -78,7 +78,6 @@ public class ClientWindow implements ActionListener
 		submit.addActionListener(this);  // calls actionPerformed of this class
 		window.add(submit);
 		
-		
 		window.setSize(400,400);
 		window.setBounds(50, 50, 400, 400);
 		window.setLayout(null);
@@ -87,7 +86,7 @@ public class ClientWindow implements ActionListener
 		window.setResizable(false);
 		this.client = client;
 		client.run();
-		updateQuestions();
+		
 		options = new JRadioButton[4];
 		optionGroup = new ButtonGroup();
 		
@@ -100,13 +99,7 @@ public class ClientWindow implements ActionListener
 			window.add(options[index]);
 			optionGroup.add(options[index]);
 		}
-
-		String[] questions = client.getQuestions();
-		question.setText(questions[0]);
-		for (int i = 0; i < 4; i++){
-			options[i].setText(questions[i+1]);
-		}
-		correct = Integer.parseInt(questions[5]);
+		updateQuestions();
 	}
 	
 
