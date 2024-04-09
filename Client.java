@@ -25,7 +25,7 @@ public class Client {
     private BufferedReader reader;
     private String response = "";
     private String windowInput;
-    private int selectedAnwser;
+    private int questionNumber;
     private String[] currentQuestions;
     private boolean questionsLoaded = false;
     
@@ -69,10 +69,8 @@ public class Client {
                 System.out.println("Connected to server");
                 while(true)
                 {
-                    if(!questionsLoaded)
-                    {
-                        readQuestions();
-                    }
+                    readQuestions();
+                    
                     
 
                     // if(getWindowInput() == "Buzz")
@@ -201,7 +199,8 @@ public class Client {
             System.out.println("Questions recieved");
             currentQuestions = questions;
             System.out.println(currentQuestions[5]);
-            questionsLoaded = true;
+            questionNumber = Integer.parseInt(currentQuestions[0]);
+            //questionsLoaded = true;
             // Now questions contains the array sent by the server
         } catch (IOException e) {
             // Handle IOException
