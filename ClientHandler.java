@@ -61,7 +61,7 @@ public class ClientHandler implements Runnable{
         //constructs a file path a scanner
         String filePath = "Project2/Questions/Question" + questionNum + ".txt";
         File file = new File(filePath);
-        String[] questions = new String[5];
+        String[] questions = new String[6];
         //reads questions out of a file using
         try(Scanner scanner = new Scanner(file)){
             //indicates data being sent is a file
