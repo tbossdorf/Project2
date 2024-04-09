@@ -50,6 +50,7 @@ public class Server {
     private Queue waitQueue;
     private boolean gameRunning = false;
     private ArrayList<String> clientScores = new ArrayList<>();
+    private int currentQuestion = 1;
 
     public Server(){
         clientHandlers = Collections.synchronizedList(new ArrayList<>());
@@ -144,7 +145,10 @@ public class Server {
                 if(gameRunning){
                     for(ClientHandler ch : clientHandlers){
                         executor.execute(ch);
+                        ch.sendQuestions(currentQuestion);
                     }
+                    
+                    
                 }else{
                     for(ClientHandler ch : clientHandlers){
                         String names = ch.getClient() + ":" + ch.getScore();

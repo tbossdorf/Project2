@@ -59,31 +59,35 @@ public class ClientHandler implements Runnable{
     //sends questions to client over output stream
     public void sendQuestions (int questionNum) throws IOException{
         //constructs a file path a scanner
-        String filePath = "src/Questions/Question" + questionNum + ".txt";
+        String filePath = "Questions/Question" + questionNum + ".txt";
         File file = new File(filePath);
+        String[] questions = new String[5];
         //reads questions out of a file using
         try(Scanner scanner = new Scanner(file)){
             //indicates data being sent is a file
             String type = "File";
             //writes the line to the output stream and sends it to client
-            outStream.writeObject(type);
+            outStream.writeUTF(type);
             //sends questionNum as an interger 
-            outStream.writeInt(questionNum);
+            questions[0] = "+"+questionNum;
             int counter = 0;
             while (counter < 5 && scanner.hasNextLine()){
                 String line = scanner.nextLine();
-                outStream.writeObject(line);
+                questions[counter+1] = line;
                 counter++;
             }
             if (scanner.hasNextInt()){
                 //sets correct answer integer being read to correct variable
                 correct = scanner.nextInt();
-                outStream.writeInt(correct);
+                questions[5] = ""+correct;
             }
+            outStream.writeObject(questions);
             //flushes output stream to ensure all data is sent
             outStream.flush();
         }
     }
+
+    
 
     //handles client responses
     private void clientResponse() throws IOException {
@@ -169,6 +173,9 @@ public class ClientHandler implements Runnable{
             System.out.println("Answer chosen by client " + this.clientID + ": " + answer + ". Correct Answer: " + correct);
             //calculates clients score
             int score = (answer == correct) ? 10 : -10;
+            if(answer == correct){
+
+            }
             outStream.writeObject("Score");
             outStream.writeInt(score);
 
@@ -186,10 +193,8 @@ public class ClientHandler implements Runnable{
     @Override
     public void run()
     {
-        int questionNum = 1;
         try{
             initialize();
-            sendQuestions(1);
             sendID();
             clientResponse();
         } catch (IOException e){

@@ -26,6 +26,7 @@ public class Client {
     private String response = "";
     private String windowInput;
     private int selectedAnwser;
+    private String[] currentQuestions;
     
     
 
@@ -115,6 +116,18 @@ public class Client {
                         break;
                     }
 
+                    try {
+                        String waitForFile = inStream.readUTF();
+                        if(waitForFile == "file"){
+                            currentQuestions = (String[]) inStream.readObject();
+                            System.out.println(currentQuestions);
+                        }
+                    } catch (Exception e) {
+                        // TODO: handle exception
+                    }
+                    
+                    
+
 
 
 
@@ -179,6 +192,13 @@ public class Client {
         return currentIP;
     }
 
+
+    public String[] getQuestions()
+    {
+        String[] questions = new String[5];
+       
+        return questions;
+    }
 
     public void updateScore(int score)
     {
