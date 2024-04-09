@@ -87,7 +87,7 @@ public class ClientWindow implements ActionListener
 		window.setResizable(false);
 		this.client = client;
 		client.run();
-
+		updateQuestions();
 		options = new JRadioButton[4];
 		optionGroup = new ButtonGroup();
 		
