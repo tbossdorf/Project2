@@ -1,4 +1,3 @@
-package Project2;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;

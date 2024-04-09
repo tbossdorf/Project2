@@ -1,10 +1,9 @@
-package Project2;
+
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 
-import Project2.Client;
 public class ClientWindowTest
 {
 	public static void main(String[] args)

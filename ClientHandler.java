@@ -1,4 +1,4 @@
-package Project2;
+
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -57,7 +57,7 @@ public class ClientHandler implements Runnable{
     }
     
     //sends questions to client over output stream
-    void sendQuestions (int questionNum) throws IOException{
+    public void sendQuestions (int questionNum) throws IOException{
         //constructs a file path a scanner
         String filePath = "src/Questions/Question" + questionNum + ".txt";
         File file = new File(filePath);
@@ -189,8 +189,7 @@ public class ClientHandler implements Runnable{
         int questionNum = 1;
         try{
             initialize();
-            sendFile("Project2/Questions/Question" + questionNum + ".txt");
-            sendQuestions(questionNum);
+            sendQuestions(1);
             sendID();
             clientResponse();
         } catch (IOException e){
@@ -198,11 +197,6 @@ public class ClientHandler implements Runnable{
         } finally{
             closeStreams();
         }
-    }
-
-    private void sendFile(String string) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'sendFile'");
     }
 
     //closes the input and output streams
