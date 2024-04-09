@@ -102,11 +102,11 @@ public class Server {
         Server server = new Server();
         server.start();
 
-        Scanner scanner = new Scanner(System.in); 
-        if(scanner.nextLine().equals("Start")){
-            server.running = true;
-        }
-        scanner.close();
+        // Scanner scanner = new Scanner(System.in); 
+        // if(scanner.nextLine().equals("Start")){
+        //     server.running = true;
+        // }
+        // scanner.close();
         
     }
 
@@ -139,7 +139,7 @@ public class Server {
                 ClientHandler clientHandler = new ClientHandler(socket, nums.remove(0), waitQueue.getQueue(), datagramSocket);
                 clientHandlers.add(clientHandler);
                 Scanner scanner = new Scanner(System.in); 
-                if(clientHandlers.size() == 1){
+                if(scanner.nextLine().equals("Start")){
                     gameRunning = true;
                 }
 
@@ -151,9 +151,8 @@ public class Server {
                     if(scanner.nextLine().equals("Next")){
                         currentQuestion++;
                     }
-                    
-                    
-                }else{
+                       
+                }else if(!gameRunning && scanner.nextLine().equals("End")){
                     for(ClientHandler ch : clientHandlers){
                         String names = ch.getClient() + ":" + ch.getScore();
                         clientScores.add(names);
