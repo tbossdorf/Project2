@@ -37,7 +37,7 @@ public class ClientWindow implements ActionListener
 	private boolean buzzed = true; //tracks if client has buzzed
 	private int correct = -1; //holds the correct answer to the question
 	private int currentQuestion = 1;
-
+	private String[] currentQuestions;
 	private String ip;
 
 	private JFrame window;
@@ -84,8 +84,6 @@ public class ClientWindow implements ActionListener
 		window.setVisible(true);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(false);
-		this.client = client;
-		client.run();
 		
 		options = new JRadioButton[4];
 		optionGroup = new ButtonGroup();
@@ -99,6 +97,8 @@ public class ClientWindow implements ActionListener
 			window.add(options[index]);
 			optionGroup.add(options[index]);
 		}
+		this.client = client;
+		client.run();
 		updateQuestions();
 	}
 	
@@ -120,7 +120,7 @@ public class ClientWindow implements ActionListener
 		for (int i = 0; i < 4; i++){
 			options[i].setText(questions[i+1]);
 		}
-		correct = Integer.parseInt(questions[5]);
+		correct = Integer.parseInt(questions[5]);		
 	}
 
 	private void nextQuestion(){
@@ -166,6 +166,7 @@ public class ClientWindow implements ActionListener
 		//System.out.println("You clicked " + e.getActionCommand());
 		// input refers to the radio button you selected or button you clicked
 		String input = e.getActionCommand();  
+		System.out.println(input);
 		switch(input)
 		{
 			case "Poll":	
@@ -200,31 +201,31 @@ public class ClientWindow implements ActionListener
 						client.sendAnswer( chosen, client.getOutStream());
 					}
 					catch(IOException e1){
-
+						System.out.println("Error sending answer");
 					}
 					
 					client.updateScore(theScore);
-					client.setWindowInput("@"+chosen);
 					canChoose = false;
 					submit.setEnabled(false);
 					updateQuestions();
 				}
 					
 								break;
-			case "Option 1":		// Your code here
-				chosen = 1;
-								break;
-			case "Option 2":		// Your code here
-				chosen = 2;
-								break;
-			case "Option 3":		// Your code here
-				chosen = 3;
-								break;
-			case "Option 4":		// Your code here
-				chosen = 4;
-								break;
 			default:
-								System.out.println(chosen == correct);
+					String button1 = options[0].getText();
+					String button2 = options[1].getText();
+					String button3 = options[2].getText();
+					String button4 = options[3].getText();
+					
+					if(input.equals(button1))
+						chosen = 1;
+					else if(input.equals(button2))
+						chosen = 2;
+					else if(input.equals(button3))
+						chosen = 3;
+					else if(input.equals(button4))
+						chosen = 4;
+					System.out.println("Chosen: " + chosen);
 		}
 		
 	}
