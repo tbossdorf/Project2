@@ -20,7 +20,8 @@ public class ClientWindow implements ActionListener
 	private JButton poll;
 	private JButton submit;
 	private JRadioButton options[];
-	private ButtonGroup optionGroup;
+	private ButtonGroup optionsGroup;
+	private String text[];
 	private JLabel question;
 	private JLabel timer;
 	private JLabel score;
@@ -37,7 +38,7 @@ public class ClientWindow implements ActionListener
 	private boolean buzzed = true; //tracks if client has buzzed
 	private int correct = -1; //holds the correct answer to the question
 	private int currentQuestion = 1;
-	private String[] currentQuestions;
+
 	private String ip;
 
 	private JFrame window;
@@ -84,9 +85,12 @@ public class ClientWindow implements ActionListener
 		window.setVisible(true);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(false);
+		this.client = client;
+		client.run();
 		
 		options = new JRadioButton[4];
-		optionGroup = new ButtonGroup();
+		optionsGroup = new ButtonGroup();
+		text = new String[4];
 		
 		for(int index=0; index<options.length; index++)
 		{
@@ -95,10 +99,8 @@ public class ClientWindow implements ActionListener
 			options[index].addActionListener(this);
 			options[index].setBounds(10, 110+(index*20), 350, 20);
 			window.add(options[index]);
-			optionGroup.add(options[index]);
+			optionsGroup.add(options[index]);
 		}
-		this.client = client;
-		client.run();
 		updateQuestions();
 	}
 	
@@ -116,17 +118,31 @@ public class ClientWindow implements ActionListener
 
 	private void updateQuestions(){
 		String[] questions = client.getQuestions();
-		question.setText(questions[0]);
+				question.setText(questions[0]);
 		for (int i = 0; i < 4; i++){
 			options[i].setText(questions[i+1]);
 		}
-		correct = Integer.parseInt(questions[5]);		
+		correct = Integer.parseInt(questions[5]);
 	}
-
-	private void nextQuestion(){
-		currentQuestion++;
-		//clientHandler(currentQuestion);
-	}
+		// if (questions != null) {
+		// 	// Update the question label and options with the new question data
+		// 	question.setText(questions[0]);
+		// 	for (int i = 0; i < options.length; i++) {
+		// 	  options[i].setText(questions[i + 1]);
+		// 	}
+		// 	correct = Integer.parseInt(questions[options.length + 1]); // Assuming correct answer index is at the end
+		
+		// 	// Reset canChoose flag to allow selecting answer for the next question
+		// 	canChoose = true;
+		// 	buzzed = false; // Reset buzzed flag as well
+		
+		// 	// Enable submit button again
+		// 	submit.setEnabled(true);
+		//   } else {
+		// 	// Handle scenario where there are no more questions (e.g., show a message)
+		// 	System.out.println("No more questions available");
+		//   }
+		// }
 
 	//handles the submit button using ack and nack
 	private void handleAcknowledgment(String acknowledgmentType) {
@@ -166,69 +182,49 @@ public class ClientWindow implements ActionListener
 		//System.out.println("You clicked " + e.getActionCommand());
 		// input refers to the radio button you selected or button you clicked
 		String input = e.getActionCommand();  
-		System.out.println(input);
-		switch(input)
-		{
-			case "Poll":	
-			
-			
-				// buzzed = true;
-				// client.setWindowInput("Buzz");
-				// handleAcknowledgment(client.getServerResponse());
-				
 
-				try{
-					client.sendBuzz(client.getUdpSocket(), client.getCurrentIP());
-					buzzed = true;
-					System.out.println(client.getServerResponse());
-					handleAcknowledgment(client.getServerResponse());
-				} catch (IOException e1){
-					e1.printStackTrace();
-				}
-								break;
-			case "Submit":	
+		if(input.equals("Poll")){
+			try{
+				client.sendBuzz(client.getUdpSocket(), client.getCurrentIP());
+				buzzed = true;
+				System.out.println(client.getServerResponse());
+				handleAcknowledgment(client.getServerResponse());
+			} catch (IOException e1){
+				e1.printStackTrace();
+			}
 			
-				if(canChoose && buzzed){
-					if (chosen == correct){
-						theScore += 10;
-					} else if (chosen != correct){
-						theScore -= 10;
-					} else{
-						theScore -= 20;
-					}
-					updateScore();
-					try{
-						client.sendAnswer( chosen, client.getOutStream());
-					}
-					catch(IOException e1){
-						System.out.println("Error sending answer");
-					}
-					
-					client.updateScore(theScore);
-					canChoose = false;
-					submit.setEnabled(false);
-					updateQuestions();
+		} else if (input.equals("Submit")){
+			if(canChoose && buzzed){
+				if (chosen == correct){
+					theScore += 10;
+				} else if (chosen != correct){
+					theScore -= 10;
+				} else{
+					theScore -= 20;
 				}
-					
-								break;
-			default:
-					String button1 = options[0].getText();
-					String button2 = options[1].getText();
-					String button3 = options[2].getText();
-					String button4 = options[3].getText();
-					
-					if(input.equals(button1))
-						chosen = 1;
-					else if(input.equals(button2))
-						chosen = 2;
-					else if(input.equals(button3))
-						chosen = 3;
-					else if(input.equals(button4))
-						chosen = 4;
-					System.out.println("Chosen: " + chosen);
+				updateScore();
+				try{
+					client.sendAnswer( chosen, client.getOutStream());
+				}
+				catch(IOException e1){
+
+				}
+				client.updateScore(theScore);
+				client.setWindowInput("@"+chosen);
+				canChoose = false;
+				submit.setEnabled(false);
+				updateQuestions();
+			}
+		} else if (input.equals(text[0])){
+			chosen = 0;
+		}else if (input.equals(text[1])){
+			chosen = 1;
+		}else if (input.equals(text[2])){
+			chosen = 2;
+		}else if (input.equals(text[3])){
+			chosen = 3;
 		}
-		
-	}
+	}	
 	
 	// this class is responsible for running the timer on the window
 	public class TimerCode extends TimerTask
@@ -246,9 +242,13 @@ public class ClientWindow implements ActionListener
 			{
 				timer.setText("Timer expired");
 				window.repaint();
+				poll.setEnabled(false);
+				submit.setEnabled(false);
+				for (JRadioButton option : options) {
+					option.setEnabled(false);
+				}
 				this.cancel();  // cancel the timed task
 				return;
-				// you can enable/disable your buttons for poll/submit here as needed
 			}
 			
 			if(duration < 6)
@@ -271,5 +271,4 @@ public class ClientWindow implements ActionListener
             }
         });
     }
-	
 }
