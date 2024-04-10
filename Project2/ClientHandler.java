@@ -24,6 +24,7 @@ public class ClientHandler implements Runnable{
     private boolean answerPressed = false; //indicates if client has pressed the answer
     private int score;
     private boolean questionAnswered = false;
+    private int questionNum = 1;
 
     
     //takes three parameters
@@ -59,8 +60,12 @@ public class ClientHandler implements Runnable{
     
     //sends questions to client over output stream
     public void sendQuestions (int questionNum) throws IOException{
+        if(this.questionNum != questionNum){
+            pollPressed = false;
+        }
+        this.questionNum = questionNum;
         //constructs a file path a scanner
-        String filePath = "Project2/Questions/Question" + questionNum + ".txt";
+        String filePath = "Project2/Project2/Questions/Question" + questionNum + ".txt";
         File file = new File(filePath);
         String[] questions = new String[6];
         //reads questions out of a file using
@@ -96,7 +101,6 @@ public class ClientHandler implements Runnable{
 
     //handles client responses
     private void clientResponse() throws IOException {
-        int questionNum = 1;
         //runs in an infinite loop
         while (true){ //always listening to client
             //reads boolean value from input stream
@@ -105,20 +109,20 @@ public class ClientHandler implements Runnable{
             
             //if client has pressed poll button
             System.out.println("Waiting for Buzz from client " + clientID);
-            byte[] buffer = new byte[256];
-            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-            udpSocket.receive(packet);
-            String receivedPacket = new String(packet.getData()).trim();
-            if(receivedPacket.equals("Buzz"))
-            {
-                pollPressed = true;
-                System.out.println("Buzz received from client " + clientID);
-                handlePoll(questionNum);
+            if(!pollPressed){
+                byte[] buffer = new byte[256];
+                DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+                udpSocket.receive(packet);
+                String receivedPacket = new String(packet.getData()).trim();
+                if(receivedPacket.equals("Buzz"))
+                {
+                    pollPressed = true;
+                    System.out.println("Buzz received from client " + clientID);
+                    handlePoll(questionNum);
+                }
             }
 
-
-
-
+           
             if(inStream.readUTF().substring(0, 1) == "@"){
                 System.out.println("Answer received from client " + clientID);
                 handleAnswer(questionNum, inStream.readUTF().substring(1, 2));
@@ -144,7 +148,8 @@ public class ClientHandler implements Runnable{
 
 
             //increments to handle multiple questions
-            questionNum++;
+            //questionNum++;
+            outStream.flush();
         }
 
     }
