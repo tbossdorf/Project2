@@ -123,7 +123,6 @@ public class ClientHandler implements Runnable{
             }
 
            
-
             if(inStream.readUTF().substring(0, 1) == "@"){
                 System.out.println("Answer received from client " + clientID);
                 handleAnswer(questionNum, inStream.readUTF().substring(1, 2));
@@ -149,7 +148,7 @@ public class ClientHandler implements Runnable{
 
 
             //increments to handle multiple questions
-            questionNum++;
+            //questionNum++;
             outStream.flush();
         }
 
