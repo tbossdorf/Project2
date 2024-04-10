@@ -139,7 +139,7 @@ public class Server {
                 ClientHandler clientHandler = new ClientHandler(socket, nums.remove(0), waitQueue.getQueue(), datagramSocket);
                 clientHandlers.add(clientHandler);
                 Scanner scanner = new Scanner(System.in); 
-                if(scanner.nextLine().equals("Start")){
+                if(clientHandlers.size() > 0){
                     gameRunning = true;
                 }
 
