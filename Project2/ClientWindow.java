@@ -182,72 +182,49 @@ public class ClientWindow implements ActionListener
 		//System.out.println("You clicked " + e.getActionCommand());
 		// input refers to the radio button you selected or button you clicked
 		String input = e.getActionCommand();  
-		switch(input)
-		{
-			case "Poll":	
-			
-			
-				// buzzed = true;
-				// client.setWindowInput("Buzz");
-				// handleAcknowledgment(client.getServerResponse());
-				
 
+		if(input.equals("Poll")){
+			try{
+				client.sendBuzz(client.getUdpSocket(), client.getCurrentIP());
+				buzzed = true;
+				System.out.println(client.getServerResponse());
+				handleAcknowledgment(client.getServerResponse());
+			} catch (IOException e1){
+				e1.printStackTrace();
+			}
+			
+		} else if (input.equals("Submit")){
+			if(canChoose && buzzed){
+				if (chosen == correct){
+					theScore += 10;
+				} else if (chosen != correct){
+					theScore -= 10;
+				} else{
+					theScore -= 20;
+				}
+				updateScore();
 				try{
-					client.sendBuzz(client.getUdpSocket(), client.getCurrentIP());
-					buzzed = true;
-					System.out.println(client.getServerResponse());
-					handleAcknowledgment(client.getServerResponse());
-				} catch (IOException e1){
-					e1.printStackTrace();
+					client.sendAnswer( chosen, client.getOutStream());
 				}
-								break;
-			case "Submit":	
-			
-				if(canChoose && buzzed){
-					if (chosen == correct){
-						theScore += 10;
-					} else if (chosen != correct){
-						theScore -= 10;
-					} else{
-						theScore -= 20;
-					}
-					updateScore();
-					try{
-						client.sendAnswer( chosen, client.getOutStream());
-					}
-					catch(IOException e1){
+				catch(IOException e1){
 
-					}
-					
-					client.updateScore(theScore);
-					client.setWindowInput("@"+chosen);
-					canChoose = false;
-					submit.setEnabled(false);
-					updateQuestions();
 				}
-								break;
-			case "Option 1":
-				if(input.equals(text[0])){
-					chosen = 0;
-				}		
-								break;
-			case "Option 2":
-			if(input.equals(text[1])){
-				chosen = 1;
+				client.updateScore(theScore);
+				client.setWindowInput("@"+chosen);
+				canChoose = false;
+				submit.setEnabled(false);
+				updateQuestions();
 			}
-								break;
-			case "Option 3":
-			if(input.equals(text[2])){
-				chosen = 2;
-			}
-								break;
-			case "Option 4":
-			if(input.equals(text[3])){
-				chosen = 3;
-			}
+		} else if (input.equals(text[0])){
+			chosen = 0;
+		}else if (input.equals(text[1])){
+			chosen = 1;
+		}else if (input.equals(text[2])){
+			chosen = 2;
+		}else if (input.equals(text[3])){
+			chosen = 3;
 		}
-		
-	}
+	}	
 	
 	// this class is responsible for running the timer on the window
 	public class TimerCode extends TimerTask
