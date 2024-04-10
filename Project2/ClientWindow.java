@@ -266,7 +266,7 @@ public class ClientWindow implements ActionListener
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-				String currentIP = "10.111.121.233";
+				String currentIP = "10.111.111.120";
                 new ClientWindow(new Client(currentIP));
             }
         });
