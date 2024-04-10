@@ -20,7 +20,8 @@ public class ClientWindow implements ActionListener
 	private JButton poll;
 	private JButton submit;
 	private JRadioButton options[];
-	private ButtonGroup optionGroup;
+	private ButtonGroup optionsGroup;
+	private String text[];
 	private JLabel question;
 	private JLabel timer;
 	private JLabel score;
@@ -88,7 +89,8 @@ public class ClientWindow implements ActionListener
 		client.run();
 		
 		options = new JRadioButton[4];
-		optionGroup = new ButtonGroup();
+		optionsGroup = new ButtonGroup();
+		text = new String[4];
 		
 		for(int index=0; index<options.length; index++)
 		{
@@ -97,7 +99,7 @@ public class ClientWindow implements ActionListener
 			options[index].addActionListener(this);
 			options[index].setBounds(10, 110+(index*20), 350, 20);
 			window.add(options[index]);
-			optionGroup.add(options[index]);
+			optionsGroup.add(options[index]);
 		}
 		updateQuestions();
 	}
@@ -116,17 +118,31 @@ public class ClientWindow implements ActionListener
 
 	private void updateQuestions(){
 		String[] questions = client.getQuestions();
-		question.setText(questions[0]);
+				question.setText(questions[0]);
 		for (int i = 0; i < 4; i++){
 			options[i].setText(questions[i+1]);
 		}
 		correct = Integer.parseInt(questions[5]);
 	}
-
-	private void nextQuestion(){
-		currentQuestion++;
-		//clientHandler(currentQuestion);
-	}
+		// if (questions != null) {
+		// 	// Update the question label and options with the new question data
+		// 	question.setText(questions[0]);
+		// 	for (int i = 0; i < options.length; i++) {
+		// 	  options[i].setText(questions[i + 1]);
+		// 	}
+		// 	correct = Integer.parseInt(questions[options.length + 1]); // Assuming correct answer index is at the end
+		
+		// 	// Reset canChoose flag to allow selecting answer for the next question
+		// 	canChoose = true;
+		// 	buzzed = false; // Reset buzzed flag as well
+		
+		// 	// Enable submit button again
+		// 	submit.setEnabled(true);
+		//   } else {
+		// 	// Handle scenario where there are no more questions (e.g., show a message)
+		// 	System.out.println("No more questions available");
+		//   }
+		// }
 
 	//handles the submit button using ack and nack
 	private void handleAcknowledgment(String acknowledgmentType) {
@@ -209,22 +225,26 @@ public class ClientWindow implements ActionListener
 					submit.setEnabled(false);
 					updateQuestions();
 				}
-					
 								break;
-			case "Option 1":		// Your code here
+			case "Option 1":
+				if(input.equals(text[0])){
+					chosen = 0;
+				}		
+								break;
+			case "Option 2":
+			if(input.equals(text[1])){
 				chosen = 1;
+			}
 								break;
-			case "Option 2":		// Your code here
+			case "Option 3":
+			if(input.equals(text[2])){
 				chosen = 2;
+			}
 								break;
-			case "Option 3":		// Your code here
+			case "Option 4":
+			if(input.equals(text[3])){
 				chosen = 3;
-								break;
-			case "Option 4":		// Your code here
-				chosen = 4;
-								break;
-			default:
-								System.out.println(chosen == correct);
+			}
 		}
 		
 	}
@@ -245,9 +265,13 @@ public class ClientWindow implements ActionListener
 			{
 				timer.setText("Timer expired");
 				window.repaint();
+				poll.setEnabled(false);
+				submit.setEnabled(false);
+				for (JRadioButton option : options) {
+					option.setEnabled(false);
+				}
 				this.cancel();  // cancel the timed task
 				return;
-				// you can enable/disable your buttons for poll/submit here as needed
 			}
 			
 			if(duration < 6)
@@ -270,5 +294,4 @@ public class ClientWindow implements ActionListener
             }
         });
     }
-	
 }
