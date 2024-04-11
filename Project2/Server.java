@@ -51,6 +51,7 @@ public class Server {
     private boolean gameRunning = false;
     private ArrayList<String> clientScores = new ArrayList<>();
     private int currentQuestion = 1;
+    private boolean questionsSent = false;
 
     public Server(){
         clientHandlers = Collections.synchronizedList(new ArrayList<>());
@@ -148,7 +149,6 @@ public class Server {
 
             while (true) {
                 Scanner scanner = new Scanner(System.in);
-                System.out.println(clientHandlers.size());
                 if(clientHandlers.size() >= 1){
                     gameRunning = true;
                 }

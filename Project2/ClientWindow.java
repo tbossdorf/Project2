@@ -101,7 +101,11 @@ public class ClientWindow implements ActionListener
 			window.add(options[index]);
 			optionsGroup.add(options[index]);
 		}
-		updateQuestions();
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				updateQuestions();
+			}
+		});
 	}
 	
 

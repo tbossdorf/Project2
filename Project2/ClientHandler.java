@@ -20,7 +20,7 @@ public class ClientHandler implements Runnable{
     private int correct = -1; //holds the correct answer to the question
     private final int clientID; //identifies the client
     private final BlockingQueue<Poll> queue; //a blocking queue that handles polls
-    private boolean pollPressed = true; //indicates if client has pressed the poll
+    private boolean pollPressed = false; //indicates if client has pressed the poll
     private int answerResult = 0; //indicates if client has pressed the answer
     private int score;
     private boolean questionAnswered = false;
@@ -108,8 +108,8 @@ public class ClientHandler implements Runnable{
             //System.out.println("Client " + clientID + " pressed Poll button:" + pollPressed);
             
             //if client has pressed poll button
-            System.out.println("Waiting for Buzz from client " + clientID);
             if(!pollPressed){
+                System.out.println("Waiting for Buzz from client " + clientID);
                 byte[] buffer = new byte[256];
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 udpSocket.receive(packet);
