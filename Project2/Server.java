@@ -132,16 +132,23 @@ public class Server {
 
     private void runTCPServer(){
         try {
-            System.out.println("TCP Server started");
-            while (true) {
-                Socket socket = serverSocket.accept();
-                System.out.println("Client connected");
-                ClientHandler clientHandler = new ClientHandler(socket, nums.remove(0), waitQueue.getQueue(), datagramSocket);
-                clientHandlers.add(clientHandler);
-                Scanner scanner = new Scanner(System.in);
-                
-                
+            new Thread(() -> {
+                try {
+                    System.out.println("TCP Server started");
+                    while (true) {
+                        Socket socket = serverSocket.accept();
+                        System.out.println("Client connected");
+                        ClientHandler clientHandler = new ClientHandler(socket, nums.remove(0), waitQueue.getQueue(), datagramSocket);
+                        clientHandlers.add(clientHandler);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
 
+            while (true) {
+                Scanner scanner = new Scanner(System.in);
+                System.out.println(clientHandlers.size());
                 if(clientHandlers.size() >= 1){
                     gameRunning = true;
                 }
@@ -164,26 +171,26 @@ public class Server {
                     //     currentQuestion++;
                     // }
                        
-                }else if(!gameRunning && scanner.nextLine().equals("End")){
-                    for(ClientHandler ch : clientHandlers){
-                        String names = ch.getClient() + ":" + ch.getScore();
-                        clientScores.add(names);
-                    }
+                // }else if(!gameRunning && scanner.nextLine().equals("End")){
+                //     for(ClientHandler ch : clientHandlers){
+                //         String names = ch.getClient() + ":" + ch.getScore();
+                //         clientScores.add(names);
+                //     }
 
-                    Collections.sort(clientScores, new Comparator<String>() {
-                        @Override
-                        public int compare(String s1, String s2) {
-                            int score1 = Integer.parseInt(s1.split(":")[1]);
-                            int score2 = Integer.parseInt(s2.split(":")[1]);
-                            return Integer.compare(score1, score2);
-                        }
-                    });
+                //     Collections.sort(clientScores, new Comparator<String>() {
+                //         @Override
+                //         public int compare(String s1, String s2) {
+                //             int score1 = Integer.parseInt(s1.split(":")[1]);
+                //             int score2 = Integer.parseInt(s2.split(":")[1]);
+                //             return Integer.compare(score1, score2);
+                //         }
+                //     });
 
-                    for(String s : clientScores){
-                        System.out.println(s);
-                    }
-                    scanner.close();
-                    break;
+                //     for(String s : clientScores){
+                //         System.out.println(s);
+                //     }
+                //     scanner.close();
+                //     break;
 
 
 
