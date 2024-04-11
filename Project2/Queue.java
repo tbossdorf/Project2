@@ -29,6 +29,10 @@ public class Queue {
     public BlockingQueue<Poll> getQueue(){
         return queue; //returns the queue
     }
+
+    public void clearQueue(){
+        queue.clear(); //clears the queue
+    }
 }
 
 

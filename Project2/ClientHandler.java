@@ -20,8 +20,8 @@ public class ClientHandler implements Runnable{
     private int correct = -1; //holds the correct answer to the question
     private final int clientID; //identifies the client
     private final BlockingQueue<Poll> queue; //a blocking queue that handles polls
-    private boolean pollPressed = true; //indicates if client has pressed the poll
-    private boolean answerPressed = false; //indicates if client has pressed the answer
+    private boolean pollPressed = false; //indicates if client has pressed the poll
+    private int answerResult = 0; //indicates if client has pressed the answer
     private int score;
     private boolean questionAnswered = false;
     private int questionNum = 1;
@@ -94,8 +94,8 @@ public class ClientHandler implements Runnable{
     }
 
 
-    public boolean questionAnswered(){
-        return questionAnswered;
+    public int questionResult(){
+        return answerResult;
     }
     
 
@@ -108,8 +108,8 @@ public class ClientHandler implements Runnable{
             //System.out.println("Client " + clientID + " pressed Poll button:" + pollPressed);
             
             //if client has pressed poll button
-            System.out.println("Waiting for Buzz from client " + clientID);
             if(!pollPressed){
+                System.out.println("Waiting for Buzz from client " + clientID);
                 byte[] buffer = new byte[256];
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 udpSocket.receive(packet);
@@ -122,24 +122,24 @@ public class ClientHandler implements Runnable{
                 }
             }
 
+            int answer = inStream.readInt();
            
-            if(inStream.readUTF().substring(0, 1) == "@"){
-                System.out.println("Answer received from client " + clientID);
-                handleAnswer(questionNum, inStream.readUTF().substring(1, 2));
+            if(answer == 1 || answer == 2 || answer == 3 || answer == 4){
+                handleAnswer(questionNum, answer);
             }
            
             
-            if(inStream.readUTF().substring(0, 6) == "Score:"){
-                System.out.println("Score received from client " + clientID);
-                this.score = Integer.parseInt(inStream.readUTF().substring(6, 7));
-                System.out.println("Score: " + score);
-            }
+            // if(inStream.readUTF().substring(0, 6) == "Score:"){
+            //     System.out.println("Score received from client " + clientID);
+            //     this.score = Integer.parseInt(inStream.readUTF().substring(6, 7));
+            //     System.out.println("Score: " + score);
+            // }
 
 
-            if(pollPressed){
-                //used handlePoll
-                handlePoll(questionNum);
-            }
+            // if(pollPressed){
+            //     //used handlePoll
+            //     handlePoll(questionNum);
+            // }
 
 
             //uses handleAnswer
@@ -149,7 +149,7 @@ public class ClientHandler implements Runnable{
 
             //increments to handle multiple questions
             //questionNum++;
-            outStream.flush();
+            // outStream.flush();
         }
 
     }
@@ -171,16 +171,18 @@ public class ClientHandler implements Runnable{
     }
     
     //client has submitted an answer
-    private void handleAnswer(int questionNum, String clientAnswer) throws IOException{
+    private void handleAnswer(int questionNum, int clientAnswer) throws IOException{
         //if client is at front of queue and answer is available
         if (!queue.isEmpty() && queue.peek().getID() == this.clientID) {
-            int answer = Integer.parseInt(clientAnswer); //read answer
+            int answer = clientAnswer; //read answer
             //prints clients chosen answer and correct answer
             System.out.println("Answer chosen by client " + this.clientID + ": " + answer + ". Correct Answer: " + correct);
             //calculates clients score
             int score = (answer == correct) ? 10 : -10;
             if(answer == correct){
-                questionAnswered = true;
+                answerResult = 1;
+            }else{
+                answerResult = -1;
             }
             outStream.writeObject("Score");
             outStream.writeInt(score);

@@ -101,7 +101,11 @@ public class ClientWindow implements ActionListener
 			window.add(options[index]);
 			optionsGroup.add(options[index]);
 		}
-		updateQuestions();
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				updateQuestions();
+			}
+		});
 	}
 	
 
@@ -118,7 +122,7 @@ public class ClientWindow implements ActionListener
 
 	private void updateQuestions(){
 		String[] questions = client.getQuestions();
-				question.setText(questions[0]);
+		question.setText(questions[0]);
 		for (int i = 0; i < 4; i++){
 			options[i].setText(questions[i+1]);
 		}

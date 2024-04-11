@@ -51,6 +51,7 @@ public class Server {
     private boolean gameRunning = false;
     private ArrayList<String> clientScores = new ArrayList<>();
     private int currentQuestion = 1;
+    private boolean questionsSent = false;
 
     public Server(){
         clientHandlers = Collections.synchronizedList(new ArrayList<>());
@@ -132,49 +133,64 @@ public class Server {
 
     private void runTCPServer(){
         try {
-            System.out.println("TCP Server started");
+            new Thread(() -> {
+                try {
+                    System.out.println("TCP Server started");
+                    while (true) {
+                        Socket socket = serverSocket.accept();
+                        System.out.println("Client connected");
+                        ClientHandler clientHandler = new ClientHandler(socket, nums.remove(0), waitQueue.getQueue(), datagramSocket);
+                        clientHandlers.add(clientHandler);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
             while (true) {
-                Socket socket = serverSocket.accept();
-                System.out.println("Client connected");
-                ClientHandler clientHandler = new ClientHandler(socket, nums.remove(0), waitQueue.getQueue(), datagramSocket);
-                clientHandlers.add(clientHandler);
-                Scanner scanner = new Scanner(System.in); 
-                if(clientHandlers.size() > 0){
+                Scanner scanner = new Scanner(System.in);
+                if(clientHandlers.size() >= 1){
                     gameRunning = true;
                 }
 
                 if(gameRunning){
                     for(ClientHandler ch : clientHandlers){
+                        if(ch.getSocket().isClosed()){
+                            clientHandlers.remove(ch);
+                        }
                         executor.execute(ch);
                         ch.sendQuestions(currentQuestion);
-                        if(ch.questionAnswered()){
+                        if(ch.questionResult() != -1 && ch.questionResult() != 0){
+                            waitQueue.clearQueue();
                             currentQuestion++;
                         }
                     }
+
+                    
                     // if(scanner.nextLine().equals("Next")){
                     //     currentQuestion++;
                     // }
                        
-                }else if(!gameRunning && scanner.nextLine().equals("End")){
-                    for(ClientHandler ch : clientHandlers){
-                        String names = ch.getClient() + ":" + ch.getScore();
-                        clientScores.add(names);
-                    }
+                // }else if(!gameRunning && scanner.nextLine().equals("End")){
+                //     for(ClientHandler ch : clientHandlers){
+                //         String names = ch.getClient() + ":" + ch.getScore();
+                //         clientScores.add(names);
+                //     }
 
-                    Collections.sort(clientScores, new Comparator<String>() {
-                        @Override
-                        public int compare(String s1, String s2) {
-                            int score1 = Integer.parseInt(s1.split(":")[1]);
-                            int score2 = Integer.parseInt(s2.split(":")[1]);
-                            return Integer.compare(score1, score2);
-                        }
-                    });
+                //     Collections.sort(clientScores, new Comparator<String>() {
+                //         @Override
+                //         public int compare(String s1, String s2) {
+                //             int score1 = Integer.parseInt(s1.split(":")[1]);
+                //             int score2 = Integer.parseInt(s2.split(":")[1]);
+                //             return Integer.compare(score1, score2);
+                //         }
+                //     });
 
-                    for(String s : clientScores){
-                        System.out.println(s);
-                    }
-                    scanner.close();
-                    break;
+                //     for(String s : clientScores){
+                //         System.out.println(s);
+                //     }
+                //     scanner.close();
+                //     break;
 
 
 
