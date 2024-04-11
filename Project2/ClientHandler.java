@@ -20,10 +20,10 @@ public class ClientHandler implements Runnable{
     private int correct = -1; //holds the correct answer to the question
     private final int clientID; //identifies the client
     private final BlockingQueue<Poll> queue; //a blocking queue that handles polls
-    private boolean pollPressed = false; //indicates if client has pressed the poll
-    private boolean answerPressed = false; //indicates if client has pressed the answer
+    private boolean pollPressed = true; //indicates if client has pressed the poll
+    private int answerResult = 0; //indicates if client has pressed the answer
     private int score;
-    private boolean questionCorrect = false;
+    private boolean questionAnswered = false;
     private int questionNum = 1;
 
     
@@ -94,8 +94,8 @@ public class ClientHandler implements Runnable{
     }
 
 
-    public boolean questionCorrect(){
-        return questionCorrect;
+    public int questionResult(){
+        return answerResult;
     }
     
 
@@ -122,20 +122,24 @@ public class ClientHandler implements Runnable{
                 }
             }
 
-            
-            int response = inStream.read();
-            System.out.println("Response received from client " + clientID + ": " + response);
-            
-            handleAnswer(questionNum, response);
+           
+            if(inStream.readUTF().substring(0, 1) == "@"){
+                System.out.println("Answer received from client " + clientID);
+                handleAnswer(questionNum, inStream.readUTF().substring(1, 2));
+            }
            
             
-            
-
-
-            if(pollPressed){
-                //used handlePoll
-                handlePoll(questionNum);
+            if(inStream.readUTF().substring(0, 6) == "Score:"){
+                System.out.println("Score received from client " + clientID);
+                this.score = Integer.parseInt(inStream.readUTF().substring(6, 7));
+                System.out.println("Score: " + score);
             }
+
+
+            // if(pollPressed){
+            //     //used handlePoll
+            //     handlePoll(questionNum);
+            // }
 
 
             //uses handleAnswer
@@ -145,7 +149,7 @@ public class ClientHandler implements Runnable{
 
             //increments to handle multiple questions
             //questionNum++;
-            //outStream.flush();
+            // outStream.flush();
         }
 
     }
@@ -167,16 +171,18 @@ public class ClientHandler implements Runnable{
     }
     
     //client has submitted an answer
-    private void handleAnswer(int questionNum, int clientAnswer) throws IOException{
+    private void handleAnswer(int questionNum, String clientAnswer) throws IOException{
         //if client is at front of queue and answer is available
         if (!queue.isEmpty() && queue.peek().getID() == this.clientID) {
-            int answer = clientAnswer; //read answer
+            int answer = Integer.parseInt(clientAnswer); //read answer
             //prints clients chosen answer and correct answer
             System.out.println("Answer chosen by client " + this.clientID + ": " + answer + ". Correct Answer: " + correct);
             //calculates clients score
             int score = (answer == correct) ? 10 : -10;
             if(answer == correct){
-                questionCorrect = true;
+                answerResult = 1;
+            }else{
+                answerResult = -1;
             }
             outStream.writeObject("Score");
             outStream.writeInt(score);

@@ -28,6 +28,7 @@ public class Client {
     private int questionNumber;
     private String[] currentQuestions;
     private boolean questionsLoaded = false;
+    private boolean canChoose = false;
     
     
 
@@ -120,10 +121,12 @@ public class Client {
                     if(serverResponse.equals("ack")){
                         System.out.println("ack recieved");
                         this.response = "ack";
+                        canChoose = true;
                         break;
-                    }else if(serverResponse.equals("nack")){
+                    }else if(serverResponse.equals("negative-ack")){
                         System.out.println("nack recieved");
-                        this.response = "nack";
+                        this.response = "negative-ack";
+                        canChoose = false;
                         break;
                     }
 
@@ -236,6 +239,9 @@ public class Client {
         outStream.flush();
     }
 
+    public boolean canChoose(){
+        return canChoose;
+    }
 
     public ObjectOutputStream getOutStream()
     {

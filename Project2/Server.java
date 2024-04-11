@@ -138,26 +138,27 @@ public class Server {
                 System.out.println("Client connected");
                 ClientHandler clientHandler = new ClientHandler(socket, nums.remove(0), waitQueue.getQueue(), datagramSocket);
                 clientHandlers.add(clientHandler);
-                Scanner scanner = new Scanner(System.in); 
-                if(clientHandlers.size() > 0){
+                Scanner scanner = new Scanner(System.in);
+                
+                
+
+                if(clientHandlers.size() >= 1){
                     gameRunning = true;
                 }
 
-                for(ClientHandler ch : clientHandlers){
-                    ch.sendQuestions(currentQuestion);
-                }
                 if(gameRunning){
                     for(ClientHandler ch : clientHandlers){
                         if(ch.getSocket().isClosed()){
                             clientHandlers.remove(ch);
                         }
                         executor.execute(ch);
-                        //ch.sendQuestions(currentQuestion);
-                        if(waitQueue.poll().getID() == ch.getClient()){
-                            if(ch.questionCorrect())
-                                currentQuestion++;
+                        ch.sendQuestions(currentQuestion);
+                        if(ch.questionResult() != -1 && ch.questionResult() != 0){
+                            waitQueue.clearQueue();
+                            currentQuestion++;
                         }
                     }
+
                     
                     // if(scanner.nextLine().equals("Next")){
                     //     currentQuestion++;
