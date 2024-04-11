@@ -3,4 +3,4 @@ Ears
 Fur 
 Paws
 Tails
-4
+3

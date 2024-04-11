@@ -216,13 +216,13 @@ public class ClientWindow implements ActionListener
 				updateQuestions();
 			}
 		} else if (input.equals(text[0])){
-			chosen = 0;
-		}else if (input.equals(text[1])){
 			chosen = 1;
-		}else if (input.equals(text[2])){
+		}else if (input.equals(text[1])){
 			chosen = 2;
-		}else if (input.equals(text[3])){
+		}else if (input.equals(text[2])){
 			chosen = 3;
+		}else if (input.equals(text[3])){
+			chosen = 4;
 		}
 	}	
 	
@@ -266,7 +266,7 @@ public class ClientWindow implements ActionListener
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-				String currentIP = "10.111.121.";
+				String currentIP = "10.111.103.120";
                 new ClientWindow(new Client(currentIP));
             }
         });
