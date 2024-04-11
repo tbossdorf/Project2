@@ -231,7 +231,8 @@ public class Client {
 
     public void sendAnswer(int answer, ObjectOutputStream outStream) throws IOException
     {
-        outStream.writeUTF("@"+answer);
+        //System.out.println("Sending answer to server");
+        outStream.writeInt(answer);
         outStream.flush();
     }
 

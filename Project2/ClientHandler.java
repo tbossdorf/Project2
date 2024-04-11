@@ -122,19 +122,14 @@ public class ClientHandler implements Runnable{
                 }
             }
 
-            String response = inStream.readUTF();
+            
+            int response = inStream.read();
             System.out.println("Response received from client " + clientID + ": " + response);
-            if(response.substring(0, 1) == "@"){
-                System.out.println("Answer received from client " + clientID);
-                handleAnswer(questionNum, response.substring(1, 2));
-            }
+            
+            handleAnswer(questionNum, response);
            
             
-            if(response.substring(0, 6) == "Score:"){
-                System.out.println("Score received from client " + clientID);
-                this.score = Integer.parseInt(response.substring(6, 7));
-                System.out.println("Score: " + score);
-            }
+            
 
 
             if(pollPressed){
@@ -172,10 +167,10 @@ public class ClientHandler implements Runnable{
     }
     
     //client has submitted an answer
-    private void handleAnswer(int questionNum, String clientAnswer) throws IOException{
+    private void handleAnswer(int questionNum, int clientAnswer) throws IOException{
         //if client is at front of queue and answer is available
         if (!queue.isEmpty() && queue.peek().getID() == this.clientID) {
-            int answer = Integer.parseInt(clientAnswer); //read answer
+            int answer = clientAnswer; //read answer
             //prints clients chosen answer and correct answer
             System.out.println("Answer chosen by client " + this.clientID + ": " + answer + ". Correct Answer: " + correct);
             //calculates clients score

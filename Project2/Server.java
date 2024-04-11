@@ -143,13 +143,16 @@ public class Server {
                     gameRunning = true;
                 }
 
+                for(ClientHandler ch : clientHandlers){
+                    ch.sendQuestions(currentQuestion);
+                }
                 if(gameRunning){
                     for(ClientHandler ch : clientHandlers){
                         if(ch.getSocket().isClosed()){
                             clientHandlers.remove(ch);
                         }
                         executor.execute(ch);
-                        ch.sendQuestions(currentQuestion);
+                        //ch.sendQuestions(currentQuestion);
                         if(waitQueue.poll().getID() == ch.getClient()){
                             if(ch.questionCorrect())
                                 currentQuestion++;
